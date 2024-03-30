@@ -85,6 +85,8 @@ function Game() {
         
         <div className="game-container">
             <h1 className="game-title">Alphabet Typing Game</h1>
+            <p className="game-instructions"> <strong> Instructions: </strong> <br/> Type the letters to the beat of the song and earn points for each correct keystroke.  <br/> Try to be as precise as possible to score higher! Get ready to improve your typing skills while having fun!</p>
+
             {!isPlaying && <button className="start-link" onClick={startGame}>Play</button>}
             <div className="game-content">
                 <div className="score">Score: {score}</div>
@@ -98,8 +100,12 @@ function Game() {
                 )}
             </div>
             <div className="game-links">
+
+            {/* <button className="restart-link" onClick={restartGame}>Restart Game</button> */}
+                
+                {isPlaying && <button className="restart-link" onClick={restartGame}>Restart Game</button>}
                 <Link to="/" className="home-link">Go Back to Home</Link>
-                <button className="restart-link" onClick={restartGame}>Restart Game</button>
+                
             </div>
         </div>
 
