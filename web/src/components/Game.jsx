@@ -7,6 +7,7 @@ const alphabetSong = {
 const epsilon = 0.25;
 
 import { useEffect, useState } from "react";
+import {Route, Link, Routes} from 'react-router-dom';
 import { useStopwatch } from "react-use-precision-timer";
 import Type from "./Type";
 import "../App.css";
@@ -29,56 +30,82 @@ function Game() {
     //Stopwatch object from https://justinmahar.github.io/react-use-precision-timer/?path=/story/docs-usetimer--docs#timer
     const stopwatch = useStopwatch();
     const [score, setScore] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(false);
     const [_, setOurTimer] = useState(0); //Use ourTimer to cause render in a small interval
     const [typeObjects, setTypeObjects] = useState(getAllTypingNeeded(alphabetSong));
 
     useEffect(() => {
-        stopwatch.start();
-        new Audio("/songs/abc.mp3").play();
+        if (isPlaying) {
 
-        //Causes render every 10 ms
-        setInterval(() => {
-            setOurTimer(stopwatch.getElapsedRunningTime());
-        }, 10);
+            stopwatch.start();
+            new Audio("/songs/abc.mp3").play();
 
-        //Handles key press
-        document.addEventListener('keydown', e => {
-            const key = e.key.toLowerCase();
-            const currentTime = stopwatch.getElapsedRunningTime() / 1000;
+            //Causes render every 10 ms
+            setInterval(() => {
+                setOurTimer(stopwatch.getElapsedRunningTime());
+            }, 10);
 
-            //Checks if it is a valid click
-            if (Object.keys(alphabetSong).includes(key)) {
-                const validPressTimes = alphabetSong[key];
-                for (let i = 0; i < validPressTimes.length; i++) {
-                    const checkPressTime = validPressTimes[i];
+            //Handles key press
+            document.addEventListener('keydown', e => {
+                const key = e.key.toLowerCase();
+                const currentTime = stopwatch.getElapsedRunningTime() / 1000;
 
-                    //Click time is close enough to an intended click
-                    if (currentTime >= checkPressTime - epsilon && currentTime <= checkPressTime + epsilon) {
-                        setScore(prevScore => prevScore + 1);
-                        alphabetSong[key].splice(i, 1); //Get rid of used click
-                        setTypeObjects(getAllTypingNeeded(alphabetSong));
-                        break;
-                    } else if (checkPressTime > currentTime) { //Times are sorted so exit if higher
-                        break
+                //Checks if it is a valid click
+                if (Object.keys(alphabetSong).includes(key)) {
+                    const validPressTimes = alphabetSong[key];
+                    for (let i = 0; i < validPressTimes.length; i++) {
+                        const checkPressTime = validPressTimes[i];
+
+                        //Click time is close enough to an intended click
+                        if (currentTime >= checkPressTime - epsilon && currentTime <= checkPressTime + epsilon) {
+                            setScore(prevScore => prevScore + 1);
+                            alphabetSong[key].splice(i, 1); //Get rid of used click
+                            setTypeObjects(getAllTypingNeeded(alphabetSong));
+                            break;
+                        } else if (checkPressTime > currentTime) { //Times are sorted so exit if higher
+                            break
+                        }
                     }
                 }
-            }
-        })
-    }, []);
+            })
+        }
+    }, [isPlaying]);
+
+    const restartGame = () => {
+        window.location.reload();
+    };
+
+    const startGame = () => {
+        setScore(0);
+        setIsPlaying(true);
+    };
 
     return (
         <>
-            <div>Score: {score}</div>
-            <div id="range"></div>
-            {typeObjects.map((t) =>
-                <Type key={t[0] + t[1]}
-                    time={t[0] * 1000}
-                    letter={t[1]}
-                    currentTime={stopwatch.getElapsedRunningTime()}
-                />
-            )}
+        
+        <div className="game-container">
+            <h1 className="game-title">Alphabet Typing Game</h1>
+            {!isPlaying && <button className="start-link" onClick={startGame}>Play</button>}
+            <div className="game-content">
+                <div className="score">Score: {score}</div>
+                <div id="range"></div>
+                {typeObjects.map((t) =>
+                    <Type key={t[0] + t[1]}
+                        time={t[0] * 1000}
+                        letter={t[1]}
+                        currentTime={stopwatch.getElapsedRunningTime()}
+                    />
+                )}
+            </div>
+            <div className="game-links">
+                <Link to="/" className="home-link">Go Back to Home</Link>
+                <button className="restart-link" onClick={restartGame}>Restart Game</button>
+            </div>
+        </div>
+
         </>
     )
+    
 }
 
 export default Game;

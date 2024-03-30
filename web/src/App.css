@@ -12,10 +12,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em pink);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em pink);
 }
 
 @keyframes logo-spin {
@@ -53,9 +53,105 @@
   left: calc(50% - 25px);
   width: 50px;
   height: 50px;
-  background-color: aqua;
+  background-color: pink;
 }
 
 html {
   overflow-x: hidden;
+}
+
+body {
+  background-color: #ffe5b9;
+  color: #333;
+}
+
+h1 {
+  color: #ff9933;
+}
+
+p {
+  color: #666;
+}
+
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #ff9933;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #e67300;
+}
+
+.description {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+
+.score {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.game-links {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+}
+
+.home-link, .restart-link {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #ff9933;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 18px;
+  margin-right: 30px;
+  transition: background-color 0.3s ease;
+}
+
+.home-link:hover, .restart-link:hover {
+  background-color: #e67300;
+}
+
+.home-container {
+  text-align: center;
+  padding: 50px;
+}
+
+
+.home-description {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.home-game-button{
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 0 10px;
+  font-size: 1rem;
+  background-color: #ff9933;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.home-button:hover {
+  background-color: #e67300;
 }
