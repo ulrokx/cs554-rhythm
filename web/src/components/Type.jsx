@@ -1,6 +1,6 @@
 import "../App.css";
 function Type(props) {
-    const {time, letter, currentTime} = props;
+    const {time, letter, currentTime, up} = props;
     const screenWidth = window.screen.width;
     const leftPosition = ((time - currentTime) / 10) + (screenWidth / 2) - 25;
 
@@ -8,7 +8,7 @@ function Type(props) {
     //distance = (time - currentTime) / 10;
     return (
         <>
-            <div className="type" style={{left: leftPosition +  "px"}}>
+            <div className="type" style={{left: leftPosition +  "px", transform: "translateY(" + (51 * up) + "px)"}}>
                 {letter}
             </div>
         </>

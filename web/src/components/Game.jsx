@@ -21,6 +21,12 @@ function getAllTypingNeeded(song) {
             types.push([song[letter][i], letter]);
         }
     });
+    types.sort(function(a, b) {
+        a[0] - b[0]
+    });
+    for (let i = 0; i < types.length; i++) {
+        types[i].push(i % 3);
+    }
     return types;
 }
 
@@ -35,6 +41,7 @@ function Game() {
     const [typeObjects, setTypeObjects] = useState(getAllTypingNeeded(alphabetSong));
 
     useEffect(() => {
+        console.log("here");
         if (isPlaying) {
 
             stopwatch.start();
@@ -94,6 +101,7 @@ function Game() {
                 {typeObjects.map((t) =>
                     <Type key={t[0] + t[1]}
                         time={t[0] * 1000}
+                        up={t[2]}
                         letter={t[1]}
                         currentTime={stopwatch.getElapsedRunningTime()}
                     />
