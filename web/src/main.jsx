@@ -1,11 +1,26 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import {BrowserRouter} from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import SignInPage from "./pages/SignInPage.jsx";
+import SignUpPage from "./pages/SignUpPage.jsx";
 import "./index.css";
+import HomePage from "./pages/HomePage.jsx";
+import RootLayout from "./components/RootLayout.jsx";
+import GamePage from "./pages/GamePage.jsx";
+import "./App.css";
+
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      { path: "/", element: <HomePage /> },
+      { path: "/sign-in/*", element: <SignInPage /> },
+      { path: "/sign-up/*", element: <SignUpPage /> },
+      { path: "/game", element: <GamePage /> },
+    ],
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+  <RouterProvider router={router} />,
 );
