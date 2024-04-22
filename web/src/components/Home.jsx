@@ -15,6 +15,9 @@ function Home() {
           <Link className="home-game-button" to="/Game">
             Launch Game
           </Link>
+          <Link className="home-game-button" to="/Multiplayer">
+            Multiplayer
+          </Link>
         </div>
       </div>
     </>

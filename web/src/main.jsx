@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage.jsx";
 import RootLayout from "./components/RootLayout.jsx";
 import GamePage from "./pages/GamePage.jsx";
 import "./App.css";
+import MultiplayerPage from "./pages/MultiplayerPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
       { path: "/sign-in/*", element: <SignInPage /> },
       { path: "/sign-up/*", element: <SignUpPage /> },
       { path: "/game", element: <GamePage /> },
+      { path: "/multiplayer", element: <MultiplayerPage /> },
     ],
   },
 ]);
