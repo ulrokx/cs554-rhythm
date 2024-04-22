@@ -139,3 +139,7 @@ p {
 .home-button:hover {
   background-color: #e67300;
 }
+
+.error {
+  color: red;
+}
