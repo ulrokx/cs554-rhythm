@@ -55,7 +55,7 @@ function getAllTypingNeeded(song) {
   return types;
 }
 
-function Game() {
+function Game(props) {
   //Stopwatch object from https://justinmahar.github.io/react-use-precision-timer/?path=/story/docs-usetimer--docs#timer
   const stopwatch = useStopwatch();
   const [score, setScore] = useState(0);
@@ -64,12 +64,26 @@ function Game() {
   const [typeObjects, setTypeObjects] = useState(
     getAllTypingNeeded(alphabetSong),
   );
+  const { multiplayer, updateScore, finishGame } = props;
+
+  //Used to start the game immediately if multiplayer
+  useEffect(() => {
+    if (multiplayer) {
+      startGame();
+    }
+  }, []);
 
   useEffect(() => {
-    console.log("here");
     if (isPlaying) {
       stopwatch.start();
-      new Audio("/songs/abc.mp3").play();
+
+      //Manages audio playing and stopping
+      const audio = new Audio("/songs/abc.mp3");
+      audio.play();
+      audio.addEventListener("ended", () => {
+        stopwatch.stop();
+        finishGame();
+      });
 
       //Causes render every 10 ms
       setInterval(() => {
@@ -92,7 +106,11 @@ function Game() {
               currentTime >= checkPressTime - epsilon &&
               currentTime <= checkPressTime + epsilon
             ) {
-              setScore((prevScore) => prevScore + 1);
+              setScore((prevScore) => {
+                const newScore = prevScore + 1;
+                updateScore(newScore);
+                return newScore;
+              });
               alphabetSong[key].splice(i, 1); //Get rid of used click
               setTypeObjects(getAllTypingNeeded(alphabetSong));
               break;
@@ -118,20 +136,25 @@ function Game() {
   return (
     <>
       <div className="game-container">
-        <h1 className="game-title">Alphabet Typing Game</h1>
-        <p className="game-instructions">
-          {" "}
-          <strong> Instructions: </strong> <br /> Type the letters to the beat
-          of the song and earn points for each correct keystroke. <br /> Try to
-          be as precise as possible to score higher! Get ready to improve your
-          typing skills while having fun!
-        </p>
+        <h1 className="game-title">
+          {multiplayer ? "Multiplayer Mode" : "Alphabet Typing Game"}
+        </h1>
+        {!multiplayer && (
+          <p className="game-instructions">
+            {" "}
+            <strong> Instructions: </strong> <br /> Type the letters to the beat
+            of the song and earn points for each correct keystroke. <br /> Try
+            to be as precise as possible to score higher! Get ready to improve
+            your typing skills while having fun!
+          </p>
+        )}
 
-        {!isPlaying && (
+        {!multiplayer && !isPlaying && (
           <button className="start-link" onClick={startGame}>
             Play
           </button>
         )}
+
         <div className="game-content">
           <div className="score">Score: {score}</div>
           <div id="range"></div>
@@ -148,14 +171,11 @@ function Game() {
         <div className="game-links">
           {/* <button className="restart-link" onClick={restartGame}>Restart Game</button> */}
 
-          {isPlaying && (
+          {!multiplayer && isPlaying && (
             <button className="restart-link" onClick={restartGame}>
               Restart Game
             </button>
           )}
-          <Link to="/" className="home-link">
-            Go Back to Home
-          </Link>
         </div>
       </div>
     </>

@@ -9,6 +9,7 @@ import RootLayout from "./components/RootLayout.jsx";
 import GamePage from "./pages/GamePage.jsx";
 import "./App.css";
 import MultiplayerPage from "./pages/MultiplayerPage.jsx";
+import RankingPage from "./pages/RankingPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
       { path: "/sign-up/*", element: <SignUpPage /> },
       { path: "/game", element: <GamePage /> },
       { path: "/multiplayer", element: <MultiplayerPage /> },
+      { path: "/ranking", element: <RankingPage /> },
     ],
   },
 ]);

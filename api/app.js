@@ -3,7 +3,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
-const rooms = {}; //key is roomName, value is {creator "" and players ["str"]}
+const rooms = {}; //key is roomName, value is {creatorName: string, socketId: socketId and playerIds [socketId] and players [{name: str, score: int}] and inGame bool and finished bool}
 
 io.on("connection", (socket) => {
   console.log("client connected", socket.id);
@@ -41,8 +41,10 @@ io.on("connection", (socket) => {
     rooms[roomName] = {
       creatorName: user,
       socketId: socket.id,
-      players: [],
-      playerIds: [],
+      players: [{ name: user, score: 0, socket: socket.id }],
+      playerIds: [socket.id],
+      inGame: false,
+      finished: false,
     };
     io.sockets.emit("rooms", rooms);
     socket.join(roomName);
@@ -59,15 +61,21 @@ io.on("connection", (socket) => {
       );
     }
 
+    //Checks if room if full
+    if (rooms[roomName].players.length === 5) {
+      return socket.emit("error", "Room is full");
+    }
+
     //Joins room
-    rooms[roomName].players.push(user);
+    rooms[roomName].players.push({ name: user, score: 0, socket: socket.id });
     rooms[roomName].playerIds.push(socket.id);
+    rooms[roomName].activePlayers++;
     io.sockets.emit("rooms", rooms);
     socket.join(roomName);
     socket.emit("joinRoom", roomName);
   });
 
-  socket.on("deleteRoom", (roomName, user) => {
+  socket.on("deleteRoom", (roomName) => {
     //Makes sure room exists
     if (!rooms.hasOwnProperty(roomName)) {
       return;
@@ -85,7 +93,7 @@ io.on("connection", (socket) => {
     io.sockets.emit("rooms", rooms);
   });
 
-  socket.on("leaveRoom", (roomName, user) => {
+  socket.on("leaveRoom", (roomName) => {
     //Makes sure room exists
     if (!rooms.hasOwnProperty(roomName)) {
       return;
@@ -105,28 +113,112 @@ io.on("connection", (socket) => {
     const idx = rooms[roomName].playerIds.indexOf(socket.id);
     rooms[roomName].players.splice(idx, 1);
     rooms[roomName].playerIds.splice(idx, 1);
+    rooms[roomName].activePlayers--;
     socket.emit("leaveRoom");
     io.sockets.emit("rooms", rooms);
+  });
+
+  socket.on("startGame", (roomName) => {
+    //Makes sure room exists
+    if (!rooms.hasOwnProperty(roomName)) {
+      return;
+    }
+
+    //Only the creator of the room can start the game
+    if (rooms[roomName].socketId !== socket.id) {
+      return;
+    }
+
+    //Makes sure the room has enough players to start
+    if (rooms[roomName].players.length < 2) {
+      return;
+    }
+
+    //Starts the game
+    rooms[roomName].inGame = true;
+    io.to(roomName).emit("startGame");
+    io.sockets.emit("rooms", rooms);
+  });
+
+  socket.on("updatedScore", (roomName, score) => {
+    //Makes sure room exists
+    if (!rooms.hasOwnProperty(roomName)) {
+      return;
+    }
+
+    //Makes sure player is in the room
+    if (!rooms[roomName].playerIds.includes(socket.id)) {
+      return;
+    }
+
+    //Updates the score
+    const idx = rooms[roomName].playerIds.indexOf(socket.id);
+    rooms[roomName].players[idx].score = score;
+    io.sockets.emit("rooms", rooms);
+  });
+
+  socket.on("endGame", (roomName) => {
+    //Makes sure room exists
+    if (!rooms.hasOwnProperty(roomName)) {
+      return;
+    }
+
+    //Makes sure player is in the room
+    if (!rooms[roomName].playerIds.includes(socket.id)) {
+      return;
+    }
+
+    //Updates player to be finished
+    const idx = rooms[roomName].playerIds.indexOf(socket.id);
+    rooms[roomName].players[idx].finished = true;
+
+    //Checks if all players are finished
+    let allFinished = true;
+    for (let i = 0; i < rooms[roomName].players.length; i++) {
+      if (!rooms[roomName].players[i].finished) {
+        allFinished = false;
+        break;
+      }
+    }
+    if (allFinished) {
+      io.to(roomName).emit("allFinished", rooms[roomName].players);
+    }
   });
 
   socket.on("disconnect", () => {
     //Updates the rooms of the leaving client
     for (const [roomName, room] of Object.entries(rooms)) {
-      if (room.playerIds.includes(socket.id)) {
-        //Removes client from any rooms they were in
-        const idx = room.playerIds.indexOf(socket.id);
-        const updatedPlayers = room.players.toSpliced(idx, 1);
-        const updatedPlayerIds = room.playerIds.toSpliced(idx, 1);
-        console.log(updatedPlayers);
-        rooms[roomName].players = updatedPlayers;
-        rooms[roomName].playerIds = updatedPlayerIds;
-        io.sockets.emit("rooms", rooms);
-      } else if (room.socketId === socket.id) {
-        //Deletes room if client was the room creator
+      if (
+        (room.socketId === socket.id && !room.inGame) ||
+        (room.playerIds.includes(socket.id) && room.players.length === 1)
+      ) {
+        //Deletes room if client was the room creator (not in game) or if it is the last player
         delete rooms[roomName];
         io.to(roomName).emit("leaveRoom");
         io.in(roomName).socketsLeave();
         io.sockets.emit("rooms", rooms);
+      } else if (room.playerIds.includes(socket.id)) {
+        //Removes client from any rooms they were in
+        const idx = room.playerIds.indexOf(socket.id);
+        const updatedPlayers = room.players.toSpliced(idx, 1);
+        const updatedPlayerIds = room.playerIds.toSpliced(idx, 1);
+        rooms[roomName].players = updatedPlayers;
+        rooms[roomName].playerIds = updatedPlayerIds;
+        io.sockets.emit("rooms", rooms);
+
+        //Checks if all players are finished after the other player left
+        if (room.inGame) {
+          let allFinished = true;
+          for (let i = 0; i < rooms[roomName].players.length; i++) {
+            if (!rooms[roomName].players[i].finished) {
+              allFinished = false;
+              break;
+            }
+          }
+          if (allFinished) {
+            io.to(roomName).emit("allFinished");
+          }
+        }
       }
     }
     console.log("client disconnected", socket.id);
