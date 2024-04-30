@@ -26,8 +26,9 @@ const alphabetSong = {
   w: [15.83],
   x: [16.78],
   y: [17.73],
-  z: [18.73],
+  z: [18.73]
 };
+
 //Leeway for correct click
 const epsilon = 0.25;
 
@@ -108,7 +109,9 @@ function Game(props) {
             ) {
               setScore((prevScore) => {
                 const newScore = prevScore + 1;
-                updateScore(newScore);
+                if (multiplayer) {
+                  updateScore(newScore);
+                }
                 return newScore;
               });
               alphabetSong[key].splice(i, 1); //Get rid of used click
