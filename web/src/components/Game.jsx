@@ -39,7 +39,7 @@ import Type from "./Type";
 import "../App.css";
 
 //Gets all types needed for a song: returns [[time, letter], ...]
-function getAllTypingNeeded(song) {
+function getAllTypingNeeded(song, score) {
   const letters = Object.keys(song);
   const types = [];
   letters.forEach((letter) => {
@@ -51,7 +51,7 @@ function getAllTypingNeeded(song) {
     a[0] - b[0];
   });
   for (let i = 0; i < types.length; i++) {
-    types[i].push(i % 3);
+    types[i].push((i + score) % 3);
   }
   return types;
 }
@@ -62,9 +62,8 @@ function Game(props) {
   const [score, setScore] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [_, setOurTimer] = useState(0); //Use ourTimer to cause render in a small interval
-  const [typeObjects, setTypeObjects] = useState(
-    getAllTypingNeeded(alphabetSong),
-  );
+  const [typeObjects, setTypeObjects] = useState([]);
+
   const { multiplayer, updateScore, finishGame } = props;
 
   //Used to start the game immediately if multiplayer
@@ -72,6 +71,7 @@ function Game(props) {
     if (multiplayer) {
       startGame();
     }
+    setTypeObjects(getAllTypingNeeded(alphabetSong, score));
   }, []);
 
   useEffect(() => {
@@ -112,10 +112,10 @@ function Game(props) {
                 if (multiplayer) {
                   updateScore(newScore);
                 }
+                setTypeObjects(getAllTypingNeeded(alphabetSong, newScore));
                 return newScore;
               });
               alphabetSong[key].splice(i, 1); //Get rid of used click
-              setTypeObjects(getAllTypingNeeded(alphabetSong));
               break;
             } else if (checkPressTime > currentTime) {
               //Times are sorted so exit if higher
