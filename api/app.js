@@ -1,6 +1,8 @@
-import app from "express";
+import express, { Router } from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { createUser } from "./src/data/users.js";
+const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
 const rooms = {}; //key is roomName, value is {creatorName: string, socketId: socketId and playerIds [socketId] and players [{name: str, score: int}] and inGame bool and finished bool}
@@ -223,6 +225,23 @@ io.on("connection", (socket) => {
     }
     console.log("client disconnected", socket.id);
   });
+});
+
+app.use(express.json());
+
+app.route("/webhook").post(async (req, res) => {
+  console.log("webhook received");
+  switch (req.body.type) {
+    case "user.created": {
+      console.log("new user!");
+      await createUser(req.body.data);
+      break;
+    }
+    default: {
+      console.log(`unhandled event type: ${req.body.type}`);
+    }
+  }
+  res.status(200).send();
 });
 
 httpServer.listen(4000, () => {

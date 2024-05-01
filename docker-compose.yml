@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  database:
+    image: mongo
+    volumes:
+      - mongodb:/data/db
+    ports:
+      - 27017:27017
+  cache:
+    image: redis/redis-stack
+    volumes:
+      - cachedb:/data
+    ports:
+      - 6379:6379
+  # api:
+  #   build:
+  #     context: ./api
+  #     dockerfile: Dockerfile.dev
+  #   volumes:
+  #     - ./api:/usr/src/app
+  #   ports:
+  #     - 4000:4000
+
+volumes:
+  mongodb:
+    driver: local
+  cachedb:
+    driver: local
