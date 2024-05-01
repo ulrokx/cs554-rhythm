@@ -1,0 +1,17 @@
+FROM node:20
+
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+# Install dependencies
+COPY package.json .
+RUN npm install
+
+# Bundle app source
+COPY app.js .
+COPY ./src ./src
+
+# Exports
+EXPOSE 4000
+CMD [ "npm", "run", "dev" ]
