@@ -4,6 +4,8 @@ function Type(props) {
   const screenWidth = window.screen.width;
   const leftPosition = (time - currentTime) / 10 + screenWidth / 2 - 25;
 
+  if (time < currentTime - 1000) return;
+
   //move 100px per second
   //distance = (time - currentTime) / 10;
   return (

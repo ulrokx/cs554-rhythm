@@ -109,13 +109,13 @@ function Game(props) {
             ) {
               setScore((prevScore) => {
                 const newScore = prevScore + 1;
+                alphabetSong[key].splice(i, 1); //Get rid of used click
                 if (multiplayer) {
                   updateScore(newScore);
                 }
-                setTypeObjects(getAllTypingNeeded(alphabetSong, newScore));
+                setTypeObjects(getAllTypingNeeded(alphabetSong, newScore)); //reupdate the typings
                 return newScore;
               });
-              alphabetSong[key].splice(i, 1); //Get rid of used click
               break;
             } else if (checkPressTime > currentTime) {
               //Times are sorted so exit if higher
