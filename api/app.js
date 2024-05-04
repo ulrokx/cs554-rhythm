@@ -2,10 +2,12 @@ import express, { Router } from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { createUser } from "./src/data/users.js";
+import cors from 'cors';
+import { createLevel, getLevels } from "./src/data/levels.js";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
-const rooms = {}; //key is roomName, value is {creatorName: string, socketId: socketId and playerIds [socketId] and players [{name: str, score: int}] and inGame bool and finished bool}
+const rooms = {}; //key is roomName, value is {creatorName: string, socketId: socketId and playerIds [socketId] and players [{name: str, score: int}] and level: {Level Object} and inGame bool and finished bool}
 
 io.on("connection", (socket) => {
   console.log("client connected", socket.id);
@@ -14,7 +16,7 @@ io.on("connection", (socket) => {
   socket.emit("rooms", rooms);
 
   //Client sends request to create a room
-  socket.on("createRoom", (roomName, user) => {
+  socket.on("createRoom", (roomName, user, level) => {
     //Invalid room name length
     if (roomName.length < 2 || roomName.length > 20) {
       return socket.emit(
@@ -45,6 +47,7 @@ io.on("connection", (socket) => {
       socketId: socket.id,
       players: [{ name: user, score: 0, socket: socket.id }],
       playerIds: [socket.id],
+      level,
       inGame: false,
       finished: false,
     };
@@ -228,6 +231,7 @@ io.on("connection", (socket) => {
 });
 
 app.use(express.json());
+app.use(cors());
 
 app.route("/webhook").post(async (req, res) => {
   console.log("webhook received");
@@ -242,6 +246,21 @@ app.route("/webhook").post(async (req, res) => {
     }
   }
   res.status(200).send();
+});
+
+app.route("/seed").post(async (req, res) => {
+  const fakeUser = await createUser({
+    id: "9+10=21",
+    email_addresses: [{email_address: "lol@gmail.com"}],
+    first_name: "Poop",
+    last_name: "Face",
+  });
+  req.body.user = fakeUser;
+  await createLevel(req.body);
+});
+
+app.route("/levels").get(async (req, res) => {
+  res.json(await getLevels());
 });
 
 httpServer.listen(4000, () => {

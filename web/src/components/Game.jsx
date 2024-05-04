@@ -1,34 +1,3 @@
-//Basic test song
-//Keep all lowercase for checking
-const alphabetSong = {
-  a: [4.05],
-  b: [4.52],
-  c: [4.97],
-  d: [5.5],
-  e: [6],
-  f: [6.6],
-  g: [7.03],
-  h: [8.07],
-  i: [8.57],
-  j: [9.07],
-  k: [9.45],
-  l: [9.93],
-  m: [10.22],
-  n: [10.45],
-  o: [10.77],
-  p: [10.93],
-  q: [11.98],
-  r: [12.54],
-  s: [13.04],
-  t: [13.95],
-  u: [14.47],
-  v: [14.91],
-  w: [15.83],
-  x: [16.78],
-  y: [17.73],
-  z: [18.73]
-};
-
 //Leeway for correct click
 const epsilon = 0.25;
 
@@ -64,14 +33,14 @@ function Game(props) {
   const [_, setOurTimer] = useState(0); //Use ourTimer to cause render in a small interval
   const [typeObjects, setTypeObjects] = useState([]);
 
-  const { multiplayer, updateScore, finishGame } = props;
+  const { multiplayer, updateScore, finishGame, level, levelName } = props;
 
   //Used to start the game immediately if multiplayer
   useEffect(() => {
     if (multiplayer) {
       startGame();
     }
-    setTypeObjects(getAllTypingNeeded(alphabetSong, score));
+    setTypeObjects(getAllTypingNeeded(level, score));
   }, []);
 
   useEffect(() => {
@@ -97,8 +66,8 @@ function Game(props) {
         const currentTime = stopwatch.getElapsedRunningTime() / 1000;
 
         //Checks if it is a valid click
-        if (Object.keys(alphabetSong).includes(key)) {
-          const validPressTimes = alphabetSong[key];
+        if (Object.keys(level).includes(key)) {
+          const validPressTimes = level[key];
           for (let i = 0; i < validPressTimes.length; i++) {
             const checkPressTime = validPressTimes[i];
 
@@ -109,11 +78,11 @@ function Game(props) {
             ) {
               setScore((prevScore) => {
                 const newScore = prevScore + 1;
-                alphabetSong[key].splice(i, 1); //Get rid of used click
+                level[key].splice(i, 1); //Get rid of used click
                 if (multiplayer) {
                   updateScore(newScore);
                 }
-                setTypeObjects(getAllTypingNeeded(alphabetSong, newScore)); //reupdate the typings
+                setTypeObjects(getAllTypingNeeded(level, newScore)); //reupdate the typings
                 return newScore;
               });
               break;
@@ -142,6 +111,7 @@ function Game(props) {
         <h1 className="game-title">
           {multiplayer ? "Multiplayer Mode" : "Alphabet Typing Game"}
         </h1>
+        <h2>{levelName}</h2>
         {!multiplayer && (
           <p className="game-instructions">
             {" "}
