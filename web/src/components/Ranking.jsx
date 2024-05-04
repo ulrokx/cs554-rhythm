@@ -6,7 +6,12 @@ function Ranking(props) {
       Final Rankings:
       <ol>
         {rankings.map((player) => (
-          <li key={player.socket} style={rankings.socket === player.socket ? {fontWeight: "bold"} : {}}> 
+          <li
+            key={player.socket}
+            style={
+              rankings.socket === player.socket ? { fontWeight: "bold" } : {}
+            }
+          >
             {player.name} ({player.socket}) with a score of {player.score}
           </li>
         ))}

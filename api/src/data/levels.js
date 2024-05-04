@@ -77,7 +77,9 @@ const validateUser = async (user) => {
   if (!user._id || typeof user._id !== "string") {
     throw new Error("User ID must be a non-empty string");
   }
-  const newUser = await usersCollection.findOne({ _id: new ObjectId(user._id) });
+  const newUser = await usersCollection.findOne({
+    _id: new ObjectId(user._id),
+  });
   if (!newUser) {
     throw new Error("User not found");
   }
@@ -107,7 +109,15 @@ export const createLevel = async (level) => {
   return newLevel;
 };
 
-export const getLevels = async (level) => {
+export const getLevels = async () => {
   const levels = await levelsCollection.find().toArray();
   return levels;
-}
+};
+
+export const getLevelById = async (id) => {
+  const level = await levelsCollection.findOne({ _id: new ObjectId(id) });
+  if (!level) {
+    throw new Error("Level not found");
+  }
+  return level;
+};

@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Link, Routes } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 
 const alphabetSong = {
   name: "Alphabet",
@@ -30,12 +30,12 @@ const alphabetSong = {
     w: [15.83],
     x: [16.78],
     y: [17.73],
-    z: [18.73]
-  }
+    z: [18.73],
+  },
 };
 
 async function seed() {
-  await axios.post('http://localhost:4000/seed', alphabetSong);
+  await axios.post("http://localhost:4000/seed", alphabetSong);
 }
 
 function Home() {
@@ -55,7 +55,9 @@ function Home() {
           <Link className="home-game-button" to="/Multiplayer">
             Multiplayer
           </Link>
-          <button onClick={seed}>Seed Database (adds alphabet song w/ fake user)</button>
+          <button onClick={seed}>
+            Seed Database (adds alphabet song w/ fake user)
+          </button>
         </div>
       </div>
     </>

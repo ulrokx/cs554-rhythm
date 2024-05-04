@@ -1,4 +1,4 @@
-import Singleplayer from '../components/Singleplayer.jsx';
+import Singleplayer from "../components/Singleplayer.jsx";
 
 const SingleplayerPage = () => {
   return <Singleplayer />;

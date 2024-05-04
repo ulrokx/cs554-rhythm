@@ -1,9 +1,12 @@
-import express, { Router } from "express";
+import "dotenv/config";
+import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { createUser } from "./src/data/users.js";
-import cors from 'cors';
-import { createLevel, getLevels } from "./src/data/levels.js";
+import cors from "cors";
+import { createLevel } from "./src/data/levels.js";
+import usersRouter from "./src/routes/users.js";
+import levelsRouter from "./src/routes/levels.js";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
@@ -231,7 +234,12 @@ io.on("connection", (socket) => {
 });
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  }),
+);
 
 app.route("/webhook").post(async (req, res) => {
   console.log("webhook received");
@@ -251,7 +259,7 @@ app.route("/webhook").post(async (req, res) => {
 app.route("/seed").post(async (req, res) => {
   const fakeUser = await createUser({
     id: "9+10=21",
-    email_addresses: [{email_address: "lol@gmail.com"}],
+    email_addresses: [{ email_address: "lol@gmail.com" }],
     first_name: "Poop",
     last_name: "Face",
   });
@@ -259,9 +267,8 @@ app.route("/seed").post(async (req, res) => {
   await createLevel(req.body);
 });
 
-app.route("/levels").get(async (req, res) => {
-  res.json(await getLevels());
-});
+app.use("/levels", levelsRouter);
+app.use("/users", usersRouter);
 
 httpServer.listen(4000, () => {
   console.log(`listening on *:${4000}`);

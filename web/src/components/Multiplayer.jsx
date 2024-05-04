@@ -22,7 +22,8 @@ function createRoom(socket, roomName, user, levelId, levels) {
       return socket.emit("createRoom", roomName, user, levels[i]);
     }
   }
-  document.getElementById("error").innerHTML = "Could not find the level specified";
+  document.getElementById("error").innerHTML =
+    "Could not find the level specified";
 }
 
 function joinRoom(socket, roomName, user) {
@@ -101,7 +102,7 @@ function Multiplayer() {
   //Used to get the available levels for form population
   useEffect(() => {
     async function getData() {
-      const {data} = await axios.get("http://localhost:4000/levels");
+      const { data } = await axios.get("http://localhost:4000/levels");
       setLevels(data);
     }
     getData();
@@ -116,8 +117,15 @@ function Multiplayer() {
           Leaderboard:
           <ul>
             {getLeaderboard(rooms[roomName].players).map((player) => (
-              <li style={player.socket === socketRef.current.id ? {fontWeight: "bold"} : {}} key={player.socket}>
-                {player.name} ({player.socket}) {player.score} 
+              <li
+                style={
+                  player.socket === socketRef.current.id
+                    ? { fontWeight: "bold" }
+                    : {}
+                }
+                key={player.socket}
+              >
+                {player.name} ({player.socket}) {player.score}
               </li>
             ))}
           </ul>
@@ -142,7 +150,16 @@ function Multiplayer() {
         Players:{" "}
         <ul>
           {rooms[roomName].players.map((player) => (
-            <li style={player.socket === socketRef.current.id ? {fontWeight: "bold"} : {}} key={player.socket}>{player.name} ({player.socket})</li>
+            <li
+              style={
+                player.socket === socketRef.current.id
+                  ? { fontWeight: "bold" }
+                  : {}
+              }
+              key={player.socket}
+            >
+              {player.name} ({player.socket})
+            </li>
           ))}
         </ul>
         <br></br>
@@ -177,14 +194,16 @@ function Multiplayer() {
             document.getElementById("roomName").value,
             user.primaryEmailAddress.emailAddress,
             document.getElementById("roomLevel").value,
-            levels
+            levels,
           );
         }}
       >
         <input id="roomName" type="text" placeholder="Room Name: "></input>
         <select id="roomLevel">
           {levels.map((level) => (
-            <option key={level._id} value={level._id}>{level.name} by {level.creator.name}</option>
+            <option key={level._id} value={level._id}>
+              {level.name} by {level.creator.name}
+            </option>
           ))}
         </select>
         <input
@@ -200,7 +219,13 @@ function Multiplayer() {
           <div>{rooms[room].players.length} / 5</div>
           <button
             disabled={rooms[room].inGame || rooms[room].players.length >= 5}
-            onClick={() => joinRoom(socketRef.current, room, user.primaryEmailAddress.emailAddress)}
+            onClick={() =>
+              joinRoom(
+                socketRef.current,
+                room,
+                user.primaryEmailAddress.emailAddress,
+              )
+            }
           >
             Join Room
           </button>

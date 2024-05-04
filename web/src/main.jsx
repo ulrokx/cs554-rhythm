@@ -11,6 +11,8 @@ import "./App.css";
 import MultiplayerPage from "./pages/MultiplayerPage.jsx";
 import RankingPage from "./pages/RankingPage.jsx";
 import SingleplayerPage from "./pages/SingleplayerPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
+import LevelsPage from "./pages/LevelsPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +24,10 @@ const router = createBrowserRouter([
       { path: "/game", element: <GamePage /> },
       { path: "/multiplayer", element: <MultiplayerPage /> },
       { path: "/ranking", element: <RankingPage /> },
-      { path: "/singleplayer", element: <SingleplayerPage />}
+      { path: "/singleplayer", element: <SingleplayerPage /> },
+      { path: "/profile", element: <ProfilePage /> },
+      { path: "/profile/:id", element: <ProfilePage /> },
+      { path: "/levels", element: <LevelsPage /> },
     ],
   },
 ]);
