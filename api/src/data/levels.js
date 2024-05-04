@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { levels, users } from "./config/mongoCollections";
+import { levels, users } from "./config/mongoCollections.js";
 const usersCollection = await users();
 const levelsCollection = await levels();
 
@@ -49,7 +49,7 @@ const validateData = (data) => {
     throw new Error("Data must be an object");
   }
   const keys = Object.keys(data);
-  if (keys.length !== letters.keys) {
+  if (keys.length != letters.length) {
     throw new Error("Data must have 26 keys");
   }
   keys.forEach((key) => {
@@ -72,23 +72,23 @@ const validateData = (data) => {
   return data;
 };
 
-const validateUserId = async (userId) => {
-  userId = userId.trim();
-  if (!userId || typeof userId !== "string") {
+const validateUser = async (user) => {
+  user._id = user._id.toString().trim();
+  if (!user._id || typeof user._id !== "string") {
     throw new Error("User ID must be a non-empty string");
   }
-  const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
-  if (!user) {
+  const newUser = await usersCollection.findOne({ _id: new ObjectId(user._id) });
+  if (!newUser) {
     throw new Error("User not found");
   }
-  return user;
+  return newUser;
 };
 
 // TODO: file uploading
 export const createLevel = async (level) => {
   const name = validateName(level.name);
   const data = validateData(level.data);
-  const user = await level.userId;
+  const user = await validateUser(level.user);
   const levelDocument = {
     name,
     data,
@@ -106,3 +106,8 @@ export const createLevel = async (level) => {
   });
   return newLevel;
 };
+
+export const getLevels = async (level) => {
+  const levels = await levelsCollection.find().toArray();
+  return levels;
+}
