@@ -5,7 +5,6 @@ const LevelsPage = () => {
   const [levels, setLevels] = useState(null);
   useEffect(() => {
     (async () => {
-		debugger
       const levelsData = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/levels`,
       );

@@ -10,7 +10,7 @@ To stop the databases, run `docker-compose down` in the root directory.
 
 ## Clerk Setup
 
-Go to [Clerk](https://clerk.com) and create an account (I signed in with GitHub). Follow the instructions to create a new project. Get the publishable key, make a copy of the file .env.sample in the web directory and name it .env.local. Put the key after VITE_CLERK_PUBLISHABLE_KEY=.
+Go to [Clerk](https://clerk.com) and create an account (I signed in with GitHub). Follow the instructions to create a new project. Get the publishable key, make a copy of the file .env.sample in the web directory and name it .env.local. Put the key after VITE_CLERK_PUBLISHABLE_KEY=. Then put your secret key and publishable key in a .env file in the /api directory
 
 ## Clerk Webhook Setup
 

@@ -9,7 +9,6 @@ const ProfilePage = () => {
   const { user } = useUser();
   const { id } = useParams();
   useEffect(() => {
-    debugger;
     if (!id && !user) {
       return navigate("/sign-in");
     }
@@ -37,7 +36,7 @@ const ProfilePage = () => {
       />
       <h2>Favorite Levels</h2>
       {profile.favoriteLevels.map((level) => (
-        <div>
+        <div key={level.id}>
           <h3>{level.name}</h3>
         </div>
       ))}
