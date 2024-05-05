@@ -49,9 +49,6 @@ function Home() {
           the music!
         </p>
         <div className="button-container">
-          <Link className="home-game-button" to="/Singleplayer">
-            Singleplayer
-          </Link>
           <Link className="home-game-button" to="/Multiplayer">
             Multiplayer
           </Link>

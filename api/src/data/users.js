@@ -4,6 +4,11 @@ import { getLevelById } from "./levels.js";
 
 const usersCollection = await users();
 
+export const getAllUsers = async (id) => {
+  const users = await usersCollection.find().toArray();
+  return users;
+}
+
 export const getUserById = async (id) => {
   const user = await usersCollection.findOne({ _id: new ObjectId(id) });
   if (!user) {
@@ -62,6 +67,26 @@ export const addFavoriteLevel = async (userId, levelId) => {
   return newUser;
 };
 
+export const follow = async (userId, followId) => {
+  const user = await getUserByClerkId(userId);
+  const follow = await getUserById(followId);
+  if (
+    user.friends.find(({ _id }) => _id.toString() === followId) !==
+    undefined
+  ) {
+    return;
+  }
+  const updateResult = await usersCollection.updateOne(
+    { _id: user._id },
+    { $push: { friends: { _id: follow._id, name: follow.name } } },
+  );
+  if (updateResult.modifiedCount === 0) {
+    throw new Error("Failed to follow user");
+  }
+  const newUser = await getUserByClerkId(userId);
+  return newUser;
+};
+
 export const removeFavoriteLevel = async (userId, levelId) => {
   const user = await getUserByClerkId(userId);
   const level = await getLevelById(levelId);
@@ -77,6 +102,26 @@ export const removeFavoriteLevel = async (userId, levelId) => {
   );
   if (updateResult.modifiedCount === 0) {
     throw new Error("Failed to remove favorite level");
+  }
+  const newUser = await getUserByClerkId(userId);
+  return newUser;
+};
+
+export const unfollow = async (userId, followId) => {
+  const user = await getUserByClerkId(userId);
+  const follow = await getUserById(followId);
+  if (
+    user.friends.find(({ _id }) => _id.toString() === followId) ===
+    undefined
+  ) {
+    return;
+  }
+  const updateResult = await usersCollection.updateOne(
+    { _id: user._id },
+    { $pull: { friends: { _id: follow._id } } },
+  );
+  if (updateResult.modifiedCount === 0) {
+    throw new Error("Failed to unfollow user");
   }
   const newUser = await getUserByClerkId(userId);
   return newUser;
