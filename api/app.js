@@ -261,7 +261,7 @@ app.route("/seed").post(async (req, res) => {
     id: "9+10=21",
     email_addresses: [{ email_address: "lol@gmail.com" }],
     first_name: "Poop",
-    last_name: "Face",
+    last_name: "Face2",
   });
   req.body.user = fakeUser;
   await createLevel(req.body);

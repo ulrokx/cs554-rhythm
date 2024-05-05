@@ -36,8 +36,15 @@ const ProfilePage = () => {
       />
       <h2>Favorite Levels</h2>
       {profile.favoriteLevels.map((level) => (
-        <div key={level.id}>
+        <div key={level._id}>
           <h3>{level.name}</h3>
+        </div>
+      ))}
+
+      <h2>Following</h2>
+      {profile.friends.map((friend) => (
+        <div key={friend._id}>
+          <h3>{friend.name}</h3>
         </div>
       ))}
     </div>
