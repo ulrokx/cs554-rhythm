@@ -15,10 +15,9 @@ function sortFavorited(a, b) {
   return b.favorited - a.favorited;
 }
 async function sortPopular(a, b) {
-  const {data} = await axios.get(
-    `${import.meta.env.VITE_BACKEND_URL}/users`,
-  );
-  let cntA = 0, cntB = 0;
+  const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users`);
+  let cntA = 0,
+    cntB = 0;
   for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < data[i].favoriteLevels.length; j++) {
       if (data[i].favoriteLevels[j]._id === a._id) {
@@ -33,10 +32,10 @@ async function sortPopular(a, b) {
 }
 
 const sortOptions = {
-  "oldest": sortOld,
-  "newest": sortNew,
-  "following": sortFollowing,
-  "favorited": sortFavorited
+  oldest: sortOld,
+  newest: sortNew,
+  following: sortFollowing,
+  favorited: sortFavorited,
 };
 
 const LevelsPage = () => {
@@ -62,7 +61,7 @@ const LevelsPage = () => {
           } else {
             level.favorited = false;
           }
-          if (followingData.data.find(({_id}) => _id === level.creator._id)) {
+          if (followingData.data.find(({ _id }) => _id === level.creator._id)) {
             level.followingCreator = true;
           } else {
             level.followingCreator = false;
@@ -106,10 +105,11 @@ const LevelsPage = () => {
     setLevels((levels) =>
       levels.map((level) => ({
         ...level,
-        followingCreator: level.creator._id === id ? true : level.followingCreator,
+        followingCreator:
+          level.creator._id === id ? true : level.followingCreator,
       })),
     );
-  }
+  };
 
   async function sortLevels(by) {
     const sortFunction = sortOptions[by];
@@ -119,7 +119,6 @@ const LevelsPage = () => {
     });
   }
 
-
   const unfollow = async (id) => {
     await axios.delete(
       `${import.meta.env.VITE_BACKEND_URL}/users/follow/${id}`,
@@ -128,12 +127,13 @@ const LevelsPage = () => {
     setLevels((levels) =>
       levels.map((level) => ({
         ...level,
-        followingCreator: level.creator._id === id ? false : level.followingCreator,
+        followingCreator:
+          level.creator._id === id ? false : level.followingCreator,
       })),
     );
   };
   if (!levels) {
-	return <div>Loading...</div>;
+    return <div>Loading...</div>;
   }
   return (
     <div>
@@ -166,8 +166,8 @@ const LevelsPage = () => {
             <button onClick={() => addFavorite(level._id)}>Favorite</button>
           )}
           <button onClick={() => navigate("/game", { state: level })}>
-              Play
-            </button>
+            Play
+          </button>
         </div>
       ))}
     </div>

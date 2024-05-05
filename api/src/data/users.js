@@ -7,7 +7,7 @@ const usersCollection = await users();
 export const getAllUsers = async (id) => {
   const users = await usersCollection.find().toArray();
   return users;
-}
+};
 
 export const getUserById = async (id) => {
   const user = await usersCollection.findOne({ _id: new ObjectId(id) });
@@ -71,8 +71,7 @@ export const follow = async (userId, followId) => {
   const user = await getUserByClerkId(userId);
   const follow = await getUserById(followId);
   if (
-    user.friends.find(({ _id }) => _id.toString() === followId) !==
-    undefined
+    user.friends.find(({ _id }) => _id.toString() === followId) !== undefined
   ) {
     return;
   }
@@ -111,8 +110,7 @@ export const unfollow = async (userId, followId) => {
   const user = await getUserByClerkId(userId);
   const follow = await getUserById(followId);
   if (
-    user.friends.find(({ _id }) => _id.toString() === followId) ===
-    undefined
+    user.friends.find(({ _id }) => _id.toString() === followId) === undefined
   ) {
     return;
   }
