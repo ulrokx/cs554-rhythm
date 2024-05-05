@@ -15,7 +15,7 @@
 
 a {
   font-weight: 500;
-  color: pink;
+  color: white;
   text-decoration: inherit;
 }
 a:hover {
@@ -54,11 +54,12 @@ button:focus-visible {
 
 nav {
   width: 100%;
-  background-color: #213547;
+  background-color: #f28c8caf;
   height: 4rem;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
+  /* justify-content: space-between; */
   align-items: center;
   padding: 0 1rem;
 }
