@@ -6,7 +6,7 @@ import {
   getUserByClerkId,
   removeFavoriteLevel,
   follow,
-  unfollow
+  unfollow,
 } from "../data/users.js";
 
 const router = Router();
@@ -107,29 +107,25 @@ router.delete(
   },
 );
 
-router.delete(
-  "/follow/:userId",
-  ClerkExpressWithAuth(),
-  async (req, res) => {
-    if (!req.auth.userId) {
-      return res.status(401).json({ error: "Unauthorized" });
+router.delete("/follow/:userId", ClerkExpressWithAuth(), async (req, res) => {
+  if (!req.auth.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const { userId } = req.params;
+  if (!userId || typeof userId !== "string") {
+    return res.status(400).json({ error: "Invalid User ID" });
+  }
+  try {
+    await unfollow(req.auth.userId, req.params.userId);
+    res.status(200).json({ success: true });
+  } catch {
+    if (e.message) {
+      return res.status(400).json({ error: e.message });
+    } else {
+      return res.status(500).json({ error: "Internal server error" });
     }
-    const { userId } = req.params;
-    if (!userId || typeof userId !== "string") {
-      return res.status(400).json({ error: "Invalid User ID" });
-    }
-    try {
-      await unfollow(req.auth.userId, req.params.userId);
-      res.status(200).json({ success: true });
-    } catch {
-      if (e.message) {
-        return res.status(400).json({ error: e.message });
-      } else {
-        return res.status(500).json({ error: "Internal server error" });
-      }
-    }
-  },
-);
+  }
+});
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
