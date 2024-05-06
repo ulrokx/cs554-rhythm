@@ -143,3 +143,14 @@ p {
 .error {
   color: red;
 }
+
+.about-team {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.team-member {
+  width: 25%;
+  margin-bottom: 20px;
+}
