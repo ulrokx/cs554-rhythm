@@ -4,10 +4,15 @@ import { Server } from "socket.io";
 import { createUser } from "./src/data/users.js";
 import cors from 'cors';
 import { createLevel, getLevels } from "./src/data/levels.js";
+import configRoutes from "./src/routes/index.js";
+import fileUpload from "express-fileupload";
+import { config } from "dotenv";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
 const rooms = {}; //key is roomName, value is {creatorName: string, socketId: socketId and playerIds [socketId] and players [{name: str, score: int}] and level: {Level Object} and inGame bool and finished bool}
+
+
 
 io.on("connection", (socket) => {
   console.log("client connected", socket.id);
@@ -231,7 +236,10 @@ io.on("connection", (socket) => {
 });
 
 app.use(express.json());
+app.use(fileUpload());
+app.use(express.urlencoded({extended: true}));
 app.use(cors());
+config();
 
 app.route("/webhook").post(async (req, res) => {
   console.log("webhook received");
@@ -249,19 +257,19 @@ app.route("/webhook").post(async (req, res) => {
 });
 
 app.route("/seed").post(async (req, res) => {
-  const fakeUser = await createUser({
-    id: "9+10=21",
-    email_addresses: [{email_address: "lol@gmail.com"}],
-    first_name: "Poop",
-    last_name: "Face",
-  });
-  req.body.user = fakeUser;
-  await createLevel(req.body);
+  try {
+    await createLevel(req.body, "D:/Coding\\cs554-rhythm\\web\\public\\songs\\abc.mp3");
+    res.status(200).send('all good');
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.route("/levels").get(async (req, res) => {
   res.json(await getLevels());
 });
+
+configRoutes(app);
 
 httpServer.listen(4000, () => {
   console.log(`listening on *:${4000}`);

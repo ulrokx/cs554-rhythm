@@ -1,7 +1,14 @@
 import { ObjectId } from "mongodb";
 import { levels, users } from "./config/mongoCollections.js";
+import songHandler from "../../songHandler.js";
+import { getUserByClerk } from "./users.js";
+import { createClient } from "redis";
+import fs from 'fs';
+
 const usersCollection = await users();
 const levelsCollection = await levels();
+const fileConverter = new songHandler('./songs/');
+const client = await createClient().connect();
 
 const letters = [
   "a",
@@ -31,6 +38,25 @@ const letters = [
   "y",
   "z",
 ];
+
+export const getLevelById = async (id) => {
+  const foundLevel = await levelsCollection.findOne({_id: new ObjectId(id)});
+  return foundLevel;
+};
+
+export const getLevelSongData = async (id) => {
+  const redisKey = `song-${id}`;
+  if(await client.exists(redisKey)){
+    return JSON.parse(await client.get(redisKey));
+  }
+  else{
+    const {songPath} = await getLevelById(id);
+    const songSize = fs.statSync(songPath).size;
+    const retVal = {songPath, songSize}
+    await client.set(redisKey, JSON.stringify(retVal));
+    return retVal;
+    }
+};
 
 const validateName = (name) => {
   name = name.trim();
@@ -85,26 +111,79 @@ const validateUser = async (user) => {
 };
 
 // TODO: file uploading
-export const createLevel = async (level) => {
-  const name = validateName(level.name);
-  const data = validateData(level.data);
-  const user = await validateUser(level.user);
-  const levelDocument = {
-    name,
-    data,
-    creator: {
-      _id: user._id,
-      name: user.name,
-    },
-  };
-  const insertResult = await levelsCollection.insertOne(levelDocument);
-  if (!insertResult.insertedId) {
-    throw new Error("Failed to insert level");
+// export const createLevel = async (level) => {
+//   const name = validateName(level.name);
+//   const data = validateData(level.data);
+//   const user = await validateUser(level.user);
+//   const levelDocument = {
+//     name,
+//     data,
+//     creator: {
+//       _id: user._id,
+//       name: user.name,
+//     },
+//     published: false,
+//   };
+//   const insertResult = await levelsCollection.insertOne(levelDocument);
+//   if (!insertResult.insertedId) {
+//     throw new Error("Failed to insert level");
+//   }
+//   const newLevel = await levelsCollection.findOne({
+//     _id: insertResult.insertedId,
+//   });
+//   return newLevel;
+// };
+
+//Uploads and converts the song
+export const uploadSong = async (userId, fileObj) => {
+  const fileData = await fileConverter.storeFile(userId, fileObj);
+  const finalName = await fileConverter.convertFile(fileData);
+  return finalName;
+};
+
+export const createLevel = async (body, fileObj) => {
+  let userData;
+  try {
+    userData = await getUserByClerk(body.userId);
+  } catch (error) {
+    throw {status: 401, error: error.toString()}
   }
-  const newLevel = await levelsCollection.findOne({
+
+
+  let newLevel;
+  if(typeof fileObj === "string"){
+    newLevel = {
+      name: body.name,
+      data: body.data,
+      creator: {
+        _id: userData._id.toString(),
+        name: userData.name,
+      },
+      published: false,
+      songPath: fileObj,
+    };
+  }
+  else{
+    const fileData = await uploadSong(userData._id.toString(), fileObj);
+    newLevel = {
+      name: body.title,
+      data: {},
+      creator: {
+        _id: userData._id.toString(),
+        name: userData.name,
+      },
+      published: false,
+      songPath: fileData.fullPath,
+    };
+  }
+  const insertResult = await levelsCollection.insertOne(newLevel);
+  if (!insertResult.insertedId) {
+    throw {status: 500, error: "Internal Server Error"};
+  }
+  const resultLevel = await levelsCollection.findOne({
     _id: insertResult.insertedId,
   });
-  return newLevel;
+  return resultLevel;
 };
 
 export const getLevels = async (level) => {

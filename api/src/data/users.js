@@ -11,6 +11,14 @@ const getUserById = async (id) => {
   return user;
 };
 
+export const getUserByClerk = async (id) => {
+  const user = await usersCollection.findOne({ clerkId: id });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user;
+}
+
 export const createUser = async (user) => {
   const userDocument = {
     clerkId: user.id,

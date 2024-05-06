@@ -30,6 +30,17 @@ p {
   color: #666;
 }
 
+.editor-type-button{
+  background: transparent;
+  padding: 0;
+  color: black;
+}
+
+.full_page{
+  width: 100vw;
+  height: 40vh;
+}
+
 .button {
   display: inline-block;
   padding: 10px 20px;

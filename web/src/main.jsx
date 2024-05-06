@@ -11,6 +11,7 @@ import "./App.css";
 import MultiplayerPage from "./pages/MultiplayerPage.jsx";
 import RankingPage from "./pages/RankingPage.jsx";
 import SingleplayerPage from "./pages/SingleplayerPage.jsx";
+import Creator from "./pages/Creator.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,8 @@ const router = createBrowserRouter([
       { path: "/game", element: <GamePage /> },
       { path: "/multiplayer", element: <MultiplayerPage /> },
       { path: "/ranking", element: <RankingPage /> },
-      { path: "/singleplayer", element: <SingleplayerPage />}
+      { path: "/singleplayer", element: <SingleplayerPage />},
+      {path: "/creator", element: <Creator/>},
     ],
   },
 ]);

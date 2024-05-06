@@ -22,6 +22,7 @@ function getAllTypingNeeded(song, score) {
   for (let i = 0; i < types.length; i++) {
     types[i].push((i + score) % 3);
   }
+  console.log(types);
   return types;
 }
 

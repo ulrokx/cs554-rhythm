@@ -34,8 +34,9 @@ const alphabetSong = {
   }
 };
 
+
 async function seed() {
-  await axios.post('http://localhost:4000/seed', alphabetSong);
+  await axios.post('http://localhost:4000/seed', {...alphabetSong, userId: "user_2g17W8daeWxOH0PhtDyKSscmDTd"});
 }
 
 function Home() {
