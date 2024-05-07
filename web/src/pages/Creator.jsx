@@ -119,6 +119,7 @@ export default function Creator({...props}){
                         src={songUrl}
                         showSkipControls={false}
                         showJumpControls={false}
+                        hasDefaultKeyBindings={false}
                         autoPlayAfterSrcChange={false}
                         listenInterval={1}
                         volume={0.5}
