@@ -94,7 +94,7 @@ function GameEditor({playerRef, running, timestamp, levelData, renderFlag, onSav
                     default:
                         setFeaturedIndex(level.maxId+1);
                         setLevel((l) => {
-                            l.data.push([l.maxId+1, timeElapsed.current / 1000, key, 1]);
+                            l.data.push([l.maxId+1, timeElapsed.current / 1000, key.toLowerCase(), 1]);
                             l.data.sort((x,y) => x[1] - y[1]);
                             return {...l, maxId: l.maxId + 1};
                         });

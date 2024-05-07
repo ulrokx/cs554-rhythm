@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createLevel, getLevelById, getLevelSongData, updateLevel } from "../data/levels.js";
+import { createLevel, getLevelById, getLevelSongData, getLevels, updateLevel } from "../data/levels.js";
 import fs from 'fs';
 const router = Router();
 

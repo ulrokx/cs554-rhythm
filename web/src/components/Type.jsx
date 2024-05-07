@@ -15,6 +15,7 @@ function Type(props) {
         style={{
           left: leftPosition + "px",
           transform: "translateY(" + 51 * up + "px)",
+          textAlign: "center",
         }}
       >
         {letter}

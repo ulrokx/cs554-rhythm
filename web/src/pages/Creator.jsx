@@ -48,7 +48,7 @@ export default function Creator({...props}){
 
     async function handleSave(data, newPublished){
         //Make sure all data times are rounded
-        const roundedTimes = data.map(e => [e[0], round(e[1],2), e[2], e[3]]);
+        const roundedTimes = data.map(e => [e[0], round(e[1],2), e[2].toLowerCase(), e[3]]);
         const res = await axios.put('http://localhost:4000/levels/'+songData.id, {
             data: roundedTimes,
             name: songData.name,

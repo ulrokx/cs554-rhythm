@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { levels, users } from "./config/mongoCollections.js";
 import songHandler from "../../songHandler.js";
-import { getUserByClerk } from "./users.js";
+import { getUserByClerkId } from "./users.js";
 import { createClient } from "redis";
 import fs from 'fs';
 
@@ -99,7 +99,7 @@ export const uploadSong = async (userId, fileObj) => {
 export const createLevel = async (body, fileObj) => {
   let userData;
   try {
-    userData = await getUserByClerk(body.userId);
+    userData = await getUserByClerkId(body.userId);
   } catch (error) {
     throw {status: 401, error: error.toString()}
   }
@@ -162,10 +162,3 @@ export const getLevels = async () => {
   return levels;
 };
 
-export const getLevelById = async (id) => {
-  const level = await levelsCollection.findOne({ _id: new ObjectId(id) });
-  if (!level) {
-    throw new Error("Level not found");
-  }
-  return level;
-};
