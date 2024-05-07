@@ -40,11 +40,14 @@ const letters = [
 ];
 
 export const getLevelById = async (id) => {
+  if(!ObjectId.isValid(id)) throw {status: 400, error: "id must be a valid ObjectId"};
   const foundLevel = await levelsCollection.findOne({_id: new ObjectId(id)});
+  if(!foundLevel) throw {status: 404, error: "A level with that Id could not be found"};
   return foundLevel;
 };
 
 export const getLevelSongData = async (id) => {
+  if(!ObjectId.isValid(id)) throw {status: 400, error: "id must be a valid ObjectId"};
   const redisKey = `song-${id}`;
   if(await client.exists(redisKey)){
     return JSON.parse(await client.get(redisKey));
@@ -58,84 +61,36 @@ export const getLevelSongData = async (id) => {
     }
 };
 
-const validateName = (name) => {
-  name = name.trim();
-  if (!name || typeof name !== "string") {
-    throw new Error("Name must be a non-empty string");
-  }
 
-  if (name.length < 2 || name.length > 20) {
-    throw new Error("Name must be between 2 and 20 characters long");
+function checkString(s,label="string"){
+  if(typeof s !== "string"){
+    throw {status: 400, error: `${label} must be of type string.`};
   }
-  return name;
-};
+  const t = s.trim();
+  if(t.length === 0) throw {status: 400, error: `${label} must be of length > 0.`};
+  return t;
+}
 
-const validateData = (data) => {
-  if (!data || typeof data !== "object") {
-    throw new Error("Data must be an object");
-  }
-  const keys = Object.keys(data);
-  if (keys.length != letters.length) {
-    throw new Error("Data must have 26 keys");
-  }
-  keys.forEach((key) => {
-    if (!letters.includes(key)) {
-      throw new Error("Data must have keys a-z");
-    }
-    if (!Array.isArray(data[key])) {
-      throw new Error("Data values must be arrays");
-    }
-    data[key].forEach((value) => {
-      if (typeof value !== "number") {
-        throw new Error("Data values must be numbers");
-      }
-      if (value < 0) {
-        throw new Error("Data values must be non-negative");
-      }
-      data[key].sort((a, b) => a - b);
-    });
+function checkBoolean(b, label="boolean"){
+  if(typeof b !== "boolean") throw {status: 400, error: `${label} must be of type bool.`};
+  return b;
+}
+
+function checkLevelData(d){
+  if(!Array.isArray(d)) throw {status: 400, error: `level data must be an array.`};
+  d.forEach(e => {
+    if(!Array.isArray(e) || e.length !== 4) throw {status: 400, error: `level data is in an invalid format.`};
+    else if(isNaN(e[0])) throw {status: 400, error: `level data is in an invalid format.`};
+    else if(isNaN(e[1])) throw {status: 400, error: `level data is in an invalid format.`};
+    else if(typeof e[2] !== "string") throw {status: 400, error: `level data is in an invalid format.`};
+    else if(isNaN(e[3])) throw {status: 400, error: `level data is in an invalid format.`};
   });
-  return data;
-};
-
-const validateUser = async (user) => {
-  user._id = user._id.toString().trim();
-  if (!user._id || typeof user._id !== "string") {
-    throw new Error("User ID must be a non-empty string");
-  }
-  const newUser = await usersCollection.findOne({ _id: new ObjectId(user._id) });
-  if (!newUser) {
-    throw new Error("User not found");
-  }
-  return newUser;
-};
-
-// TODO: file uploading
-// export const createLevel = async (level) => {
-//   const name = validateName(level.name);
-//   const data = validateData(level.data);
-//   const user = await validateUser(level.user);
-//   const levelDocument = {
-//     name,
-//     data,
-//     creator: {
-//       _id: user._id,
-//       name: user.name,
-//     },
-//     published: false,
-//   };
-//   const insertResult = await levelsCollection.insertOne(levelDocument);
-//   if (!insertResult.insertedId) {
-//     throw new Error("Failed to insert level");
-//   }
-//   const newLevel = await levelsCollection.findOne({
-//     _id: insertResult.insertedId,
-//   });
-//   return newLevel;
-// };
+  return d;
+}
 
 //Uploads and converts the song
 export const uploadSong = async (userId, fileObj) => {
+  if(!ObjectId.isValid(userId)) throw {status: 400, error: "id must be a valid ObjectId"};
   const fileData = await fileConverter.storeFile(userId, fileObj);
   const finalName = await fileConverter.convertFile(fileData);
   return finalName;
@@ -154,7 +109,7 @@ export const createLevel = async (body, fileObj) => {
   if(typeof fileObj === "string"){
     newLevel = {
       name: body.name,
-      data: body.data,
+      data: checkLevelData(body.data),
       creator: {
         _id: userData._id.toString(),
         name: userData.name,
@@ -166,8 +121,8 @@ export const createLevel = async (body, fileObj) => {
   else{
     const fileData = await uploadSong(userData._id.toString(), fileObj);
     newLevel = {
-      name: body.title,
-      data: {},
+      name: body.name,
+      data: [],
       creator: {
         _id: userData._id.toString(),
         name: userData.name,
@@ -186,7 +141,23 @@ export const createLevel = async (body, fileObj) => {
   return resultLevel;
 };
 
-export const getLevels = async (level) => {
+export const updateLevel = async (id, data) => {
+    if(!ObjectId.isValid(id)) throw {status: 400, error: "id must be a valid ObjectId"};
+    const levelData = await getLevelById(id);
+    delete levelData._id;
+    //Scan body
+    const result = {
+      ...levelData,
+      name: checkString(data.name, "name"),
+      published: checkBoolean(data.published, "published"),
+      data: checkLevelData(data.data)
+    };
+
+    const updateResult = await levelsCollection.findOneAndUpdate({_id: new ObjectId(id)}, {$set: result}, {returnDocument: "after"});
+    return updateResult;
+};
+
+export const getLevels = async () => {
   const levels = await levelsCollection.find().toArray();
   return levels;
 }

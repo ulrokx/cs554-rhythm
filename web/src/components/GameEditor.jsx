@@ -2,9 +2,12 @@
 const epsilon = 0.25;
 import { useCallback, useEffect, useRef, useState } from "react";
 import "../App.css";
+import { round } from "../services/helpers";
 
 
-function EditorType({onFeature, onMoveBlock=(()=>{}), onDeleteBlock=(() => {}), featured, ...props}){
+
+
+function EditorType({onClick, onMoveBlock=(()=>{}), onDeleteBlock=(() => {}), featured, ...props}){
     const [isFeatured, setFeatured] = useState(featured || false);
     const { time, letter, currentTime, up } = props;
     const leftPosition = (time - currentTime) / 10;
@@ -22,8 +25,9 @@ function EditorType({onFeature, onMoveBlock=(()=>{}), onDeleteBlock=(() => {}), 
             textAlign: "center",
             border: isFeatured || featured ? "2px solid orange" : ""
           }}
-          onMouseEnter={() => {setFeatured(true);onFeature();}}
+          onMouseEnter={() => {setFeatured(true)}}
           onMouseLeave={() => setFeatured(false)}
+          onClick={onClick}
         >
           <span>{letter}</span>
           <div style={{textAlign: "center"}}>
@@ -39,7 +43,7 @@ let renderInterval;
 let lastTime;
 
 
-function GameEditor({running, timestamp, levelData, renderFlag, ...props}) {
+function GameEditor({playerRef, running, timestamp, levelData, renderFlag, onSave, onPublish, ...props}) {
     const [_, runRerender] = useState(undefined);
     const [level, setLevel] = useState({data: levelData, maxId: levelData.length - 1});
     const timeElapsed = useRef(timestamp*1000);
@@ -75,47 +79,98 @@ function GameEditor({running, timestamp, levelData, renderFlag, ...props}) {
         lastTime = n;
         runRerender(n);
     }, [renderFlag]);
+
+    
     
     return (
         <div
         tabIndex={0}
         onKeyDown={({key}) => {
-            const featuredIndex = level.data.findIndex(e => e[0] === featuredId);
-            if(key === 'e'){
-                setFeaturedIndex(level.data[featuredIndex+1][0]);
-            }
-            else if(featuredId !== -1){
+            if(editorSettings.placeMode){
                 switch (key) {
-                    case 'q':
-                        setFeaturedIndex(level.data[featuredIndex-1][0]);
-                        break;
-                    case 'a':
-                        setLevel((l) => {
-                            l.data[featuredIndex][1] -= editorSettings.blockMoveStep;
-                            l.data.sort((x,y) => x[1] - y[1]);
-                            return {...l};
-                        });
-                        break;
-                    case 'd':
-                        setLevel((l) => {
-                            l.data[featuredIndex][1] += editorSettings.blockMoveStep;
-                            l.data.sort((x,y) => x[1] - y[1]);
-                            return {...l};
-                        });
-                        break;
-                    case 'w':
-                        setLevel((l) => {
-                            if(l.data[featuredIndex][3] > 0) l.data[featuredIndex][3]--;
-                            return {...l};
-                        });
-                        break;
-                    case 's':
-                        setLevel((l) => {
-                            if(l.data[featuredIndex][3] < 2) l.data[featuredIndex][3]++;
-                            return {...l};
-                        });
+                    case 'Escape':
+                        setSettings({...editorSettings, placeMode: false});
                         break;
                     default:
+                        setFeaturedIndex(level.maxId+1);
+                        setLevel((l) => {
+                            l.data.push([l.maxId+1, timeElapsed.current / 1000, key, 1]);
+                            l.data.sort((x,y) => x[1] - y[1]);
+                            return {...l, maxId: l.maxId + 1};
+                        });
+                        break;
+                }
+            }
+            else{
+                const featuredIndex = level.data.findIndex(e => e[0] === featuredId);
+                switch (key) {
+                    case 'e':
+                        setFeaturedIndex(level.data[featuredIndex+1][0]);
+                        break;
+                    case 'p':
+                        setSettings({...editorSettings, placeMode: true});
+                        break;
+                    case ' ':
+                        if(running)
+                            playerRef.current.audio.current.pause();
+                        else
+                            playerRef.current.audio.current.play();
+                        break;
+                    default:
+                        if(featuredId !== -1){
+                            switch (key) {
+                                case 'q':
+                                    setFeaturedIndex(level.data[featuredIndex-1][0]);
+                                    break;
+                                case 'r':
+                                    setLevel((l) => {
+                                        return {...l, data: l.data.filter(e => e[0] !== featuredId)};
+                                    });
+                                    setFeaturedIndex(level.data[featuredIndex+1][0]);
+                                    break;
+                                case 'a':
+                                    setLevel((l) => {
+                                        l.data[featuredIndex][1] = round(l.data[featuredIndex][1] - editorSettings.blockMoveStep, 2);
+                                        l.data.sort((x,y) => x[1] - y[1]);
+                                        return {...l};
+                                    });
+                                    break;
+                                case 'd':
+                                    setLevel((l) => {
+                                        l.data[featuredIndex][1] = round(l.data[featuredIndex][1] + editorSettings.blockMoveStep, 2);
+                                        l.data.sort((x,y) => x[1] - y[1]);
+                                        return {...l};
+                                    });
+                                    break;
+                                case 'w':
+                                    setLevel((l) => {
+                                        if(l.data[featuredIndex][3] > 0) l.data[featuredIndex][3]--;
+                                        return {...l};
+                                    });
+                                    break;
+                                case 's':
+                                    setLevel((l) => {
+                                        if(l.data[featuredIndex][3] < 2) l.data[featuredIndex][3]++;
+                                        return {...l};
+                                    });
+                                    break;
+                                case 'z': 
+                                    console.log(editorSettings.blockMoveStep);
+                                    if(editorSettings.blockMoveStep > 0.1)
+                                        setSettings({...editorSettings, blockMoveStep: round(editorSettings.blockMoveStep - 0.1, 2)});
+                                    else if(editorSettings.blockMoveStep > 0)
+                                        setSettings({...editorSettings, blockMoveStep: round(editorSettings.blockMoveStep - 0.01, 2)});
+                                    break;
+                                case 'c': 
+                                    if(editorSettings.blockMoveStep < 0.1)
+                                        setSettings({...editorSettings, blockMoveStep: round(editorSettings.blockMoveStep + 0.01, 2)});
+                                    else if(editorSettings.blockMoveStep < 1)
+                                        setSettings({...editorSettings, blockMoveStep: round(editorSettings.blockMoveStep + 0.1, 2)});
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                         break;
                 }
             }
@@ -134,7 +189,7 @@ function GameEditor({running, timestamp, levelData, renderFlag, ...props}) {
                             currentTime={timeElapsed.current}
                             onMoveBlock={(forward) => {
                                 setLevel((l) => {
-                                    l.data[i][1] = forward ? l.data[i][1] + editorSettings.blockMoveStep : l.data[i][1] - editorSettings.blockMoveStep;
+                                    l.data[i][1] = forward ? round(l.data[i][1] + editorSettings.blockMoveStep,2) : round(l.data[i][1] - editorSettings.blockMoveStep,2);
                                     l.data.sort((x,y) => x[1] - y[1]);
                                     return {...l};
                                 });
@@ -142,12 +197,58 @@ function GameEditor({running, timestamp, levelData, renderFlag, ...props}) {
                             onDeleteBlock={() => setLevel(l => {
                                 return {data: [...l.data.slice(0,i), ...l.data.slice(i+1)], maxId: l.maxId};
                             })}
+                            onClick={() => {
+                                setFeaturedIndex(t[0]);
+                            }}
                         />
                     )
                 }
             </div>
-            <div style={{textAlign: "left", width: "auto"}}>
-                Step Size: {editorSettings.blockMoveStep}
+            <div style={{textAlign: "center", width: "200px", border: "1px solid gray", padding: "0 1.5rem", borderRadius: "5px"}}>
+                <h2 >Legend</h2>
+                <div style={{textAlign: "left"}}>
+                    <p hidden={editorSettings.placeMode}><span style={{fontStyle: "italic"}}>Step Size: </span>
+                        {editorSettings.blockMoveStep} {' '}
+                        <span style={{border: "1px solid black", borderRadius: "5px", padding: ".1rem"}}>
+                            <button className="editor-type-button" style={{fontSize: "20pt"}} onClick={() => {
+                                if(editorSettings.blockMoveStep > 0.1) setSettings({...editorSettings, blockMoveStep: round(editorSettings.blockMoveStep - 0.1, 2)});
+                                else if(editorSettings.blockMoveStep > 0)
+                                    setSettings({...editorSettings, blockMoveStep: round(editorSettings.blockMoveStep - 0.01, 2)});
+                            }}>-</button>{' '}
+                            <button className="editor-type-button" style={{fontSize: "20pt"}} onClick={() => {
+                                if(editorSettings.blockMoveStep < 0.1){
+                                    setSettings({...editorSettings, blockMoveStep: round(editorSettings.blockMoveStep + 0.01, 2)});
+                                }
+                                else if(editorSettings.blockMoveStep < 1)
+                                    setSettings({...editorSettings, blockMoveStep: round(editorSettings.blockMoveStep + 0.1, 2)});
+                            }}>+</button>
+                        </span>
+                    </p>
+                    <p><span style={{fontStyle: "italic"}}>Editor Mode: </span>{editorSettings.placeMode ? "Place" : "Mover"}</p>
+                    <h3 style={{padding: "0", margin: "0"}}>Controls</h3>
+                    {
+                    editorSettings.placeMode ? (
+                        <ul style={{marginTop: "0"}}>
+                            <li><span style={{fontStyle: "italic"}}>Escape: </span> Mover Mode</li>
+                            <li><span style={{fontStyle: "italic"}}>[Any Key]: </span> Place Block</li>
+                        </ul>
+                    ) : (
+                        <ul style={{marginTop: "0"}}>
+                            <li><span style={{fontStyle: "italic"}}>p: </span> Place Mode</li>
+                            <li><span style={{fontStyle: "italic"}}>x: </span> Delete Block</li>
+                            <li><span style={{fontStyle: "italic"}}>q/e: </span> Select left/right</li>
+                            <li><span style={{fontStyle: "italic"}}>a/d: </span> Move left/right</li>
+                            <li><span style={{fontStyle: "italic"}}>w/s: </span> Move up/down</li>
+                            <li><span style={{fontStyle: "italic"}}>z/c: </span> Step size up/down</li>
+                        </ul>
+                    )
+                    }
+                </div>
+
+            </div>
+            <div>
+                <button style={{width: "125px"}} onClick={() => onPublish(level.data)}>{props.isPublished ? "Unpublish" : "Publish"}</button>
+                <button style={{width: "125px"}} onClick={() => onSave(level.data)}>Save</button>
             </div>
         </div>
       );

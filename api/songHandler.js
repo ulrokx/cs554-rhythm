@@ -18,7 +18,7 @@ class songHandler{
     }
 
     async convertFile({fullPath, name, ext}){
-        if(ext === ".mp3") return name + ext;
+        if(ext === ".mp3") return {newName: name + ext, fullPath};
 
         //Convert the file with ffmpeg
         const newName = name + '.mp3';
@@ -29,7 +29,7 @@ class songHandler{
         });
         //Remove old file
         fs.rmSync(fullPath);
-        return {newName, fullPath: newPath};
+        return {newName: newName, fullPath: newPath};
     }
 }
 

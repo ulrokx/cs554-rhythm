@@ -265,10 +265,6 @@ app.route("/seed").post(async (req, res) => {
   }
 });
 
-app.route("/levels").get(async (req, res) => {
-  res.json(await getLevels());
-});
-
 configRoutes(app);
 
 httpServer.listen(4000, () => {

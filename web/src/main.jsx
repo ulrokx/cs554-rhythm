@@ -24,7 +24,8 @@ const router = createBrowserRouter([
       { path: "/multiplayer", element: <MultiplayerPage /> },
       { path: "/ranking", element: <RankingPage /> },
       { path: "/singleplayer", element: <SingleplayerPage />},
-      {path: "/creator", element: <Creator/>},
+      {path: "/creator/", element: <Creator/>},
+      {path: "/creator/:id", element: <Creator/>},
     ],
   },
 ]);
