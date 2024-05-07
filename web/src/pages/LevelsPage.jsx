@@ -136,40 +136,38 @@ const LevelsPage = () => {
     return <div>Loading...</div>;
   }
   return (
-    <div>
-      <h1>Levels</h1>
+    <div className="levels-page">
+      <h1 className="levels-header">Levels</h1>
       <h2>Order Levels By</h2>
-      <select onChange={() => sortLevels(event.target.value)}>
+      <select className="sort-dropdown" onChange={(event) => sortLevels(event.target.value)}>
         <option value="oldest">Oldest</option>
         <option value="newest">Newest</option>
         <option value="following">Following</option>
         <option value="favorited">Favorited</option>
       </select>
-      {levels.map((level) => (
-        <div key={level._id}>
-          <h2>{level.name}</h2>
-          <div>
-            <p>Created by {level.creator.name}</p>
-            {level.followingCreator ? (
-              <button onClick={() => unfollow(level.creator._id)}>
-                Unfollow
-              </button>
-            ) : (
-              <button onClick={() => follow(level.creator._id)}>Follow</button>
-            )}
+      <div className="levels-list">
+        {levels.map((level) => (
+          <div key={level._id} className="level-card">
+            <h2 className="level-name">{level.name}</h2>
+            <div className="creator-info">
+              <p>Created by <span className="creator-name">{level.creator.name}</span></p>
+              <div className="button-container">
+                {level.followingCreator ? (
+                  <button className="button unfollow-button" onClick={() => unfollow(level.creator._id)}>Unfollow</button>
+                ) : (
+                  <button className="button follow-button" onClick={() => follow(level.creator._id)}>Follow</button>
+                )}
+                {level.favorited ? (
+                  <button className="button unfavorite-button" onClick={() => removeFavorite(level._id)}>Unfavorite</button>
+                ) : (
+                  <button className="button favorite-button" onClick={() => addFavorite(level._id)}>Favorite</button>
+                )}
+                <button className="button play-button" onClick={() => navigate("/game", { state: level })}>Play</button>
+              </div>
+            </div>
           </div>
-          {level.favorited ? (
-            <button onClick={() => removeFavorite(level._id)}>
-              Unfavorite
-            </button>
-          ) : (
-            <button onClick={() => addFavorite(level._id)}>Favorite</button>
-          )}
-          <button onClick={() => navigate("/game", { state: level })}>
-            Play
-          </button>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

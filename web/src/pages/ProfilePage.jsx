@@ -26,27 +26,29 @@ const ProfilePage = () => {
     return <div>Loading...</div>;
   }
   return (
-    <div>
+    <div className="profile-page">
       <h1>{profile.name}</h1>
       <img
-        width="200px"
-        height="200px"
+        className="profile-picture"
         src={profile.image}
         alt="profile picture"
       />
-      <h2>Favorite Levels</h2>
-      {profile.favoriteLevels.map((level) => (
-        <div key={level._id}>
-          <h3>{level.name}</h3>
-        </div>
-      ))}
-
-      <h2>Following</h2>
-      {profile.friends.map((friend) => (
-        <div key={friend._id}>
-          <h3>{friend.name}</h3>
-        </div>
-      ))}
+      <div className="favorite-levels">
+        <h2>Favorite Levels</h2>
+        {profile.favoriteLevels.map((level) => (
+          <div key={level._id} className="favorite-level">
+            <h3>{level.name}</h3>
+          </div>
+        ))}
+      </div>
+      <div className="following">
+        <h2>Following</h2>
+        {profile.friends.map((friend) => (
+          <div key={friend._id} className="following-item">
+            <h3>{friend.name}</h3>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

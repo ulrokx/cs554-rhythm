@@ -26,6 +26,10 @@ h1 {
   color: #ff9933;
 }
 
+h2 {
+  color: #f28c8caf
+}
+
 p {
   color: #666;
 }
@@ -140,6 +144,14 @@ p {
   background-color: #e67300;
 }
 
+.overview-description {
+  border: 2px solid black;
+  padding: 10px;
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 .error {
   color: red;
 }
@@ -153,4 +165,194 @@ p {
 .team-member {
   width: 25%;
   margin-bottom: 20px;
+}
+
+.multiplayer-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.multiplayer-container h1 {
+  text-align: center;
+}
+
+.create-room-form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.create-room-input,
+.create-room-select {
+  margin-bottom: 10px;
+  padding: 8px;
+}
+
+.create-room-button {
+  padding: 10px 20px;
+  background-color: #f28c8caf;
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.room-info {
+  margin-bottom: 10px;
+}
+
+.error {
+  color: red;
+}
+
+.action-button {
+  padding: 8px 16px;
+  background-color: #f28c8caf;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.action-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.profile-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.profile-picture {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
+.favorite-level {
+  margin-bottom: 10px;
+}
+
+.following-item {
+  margin-bottom: 10px;
+}
+
+.loading {
+  text-align: center;
+}
+
+.levels-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.levels-header {
+  margin-bottom: 20px;
+}
+
+.sort-dropdown {
+  margin-bottom: 20px;
+}
+
+.levels-list {
+  text-align: center;
+}
+
+.level-card {
+  max-width: 300px;
+  border: 1px solid #ff9933;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 10px;
+  margin-bottom: 20px
+}
+
+.level-name {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.creator-info {
+  margin-bottom: 10px;
+}
+
+.creator-name {
+  font-weight: bold;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.follow-button {
+  background-color: #3cb371;
+  color: white;
+  padding: 8px 16px;
+  margin: 0 5px;
+  border-radius: 5px;
+}
+
+.unfollow-button {
+  background-color: #ff6347;
+  color: white;
+  padding: 8px 16px;
+  margin: 0 5px;
+  border-radius: 5px;
+}
+
+.favorite-button {
+  background-color: #6495ed;
+  color: white;
+  padding: 8px 16px;
+  margin: 0 5px;
+  border-radius: 5px;
+}
+
+.unfavorite-button {
+  background-color: #ff8c00;
+  color: white;
+  padding: 8px 16px;
+  margin: 0 5px;
+  border-radius: 5px;
+}
+
+.play-button {
+  background-color: #ff69b4;
+  color: white;
+  padding: 8px 16px;
+  margin: 0 5px;
+  border-radius: 5px;
+}
+
+.follow-button:hover {
+  background-color: #388e68;
+}
+
+.unfollow-button:hover {
+  background-color: #cc4b30;
+}
+
+.favorite-button:hover {
+  background-color: #4b77b7;
+}
+
+.unfavorite-button:hover {
+  background-color: #cc7500;
+}
+
+.play-button:hover {
+  background-color: #cc4d90;
 }

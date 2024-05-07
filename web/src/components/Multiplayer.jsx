@@ -143,50 +143,63 @@ function Multiplayer() {
     );
   } else if (inRoom) {
     return (
-      <>
-        <h1>{roomName}</h1>
-        <h2>Level Name: {rooms[roomName].level.name}</h2>
-        <h2>Room creator: {rooms[roomName].creatorName}</h2>
-        Players:{" "}
-        <ul>
-          {rooms[roomName].players.map((player) => (
-            <li
-              style={
-                player.socket === socketRef.current.id
-                  ? { fontWeight: "bold" }
-                  : {}
-              }
-              key={player.socket}
+      <div className="multiplayer-container">
+        <h1>Multiplayer Room</h1>
+        <div className="room-info">
+          <p><strong>Room Name:</strong> {roomName}</p>
+          <p><strong>Level Name:</strong> {rooms[roomName].level.name}</p>
+          <p><strong>Room creator:</strong> {rooms[roomName].creatorName}</p>
+          <p><strong>Players:</strong></p>
+          <ul>
+            {rooms[roomName].players.map((player) => (
+              <li
+                style={
+                  player.socket === socketRef.current.id
+                    ? { fontWeight: "bold" }
+                    : {}
+                }
+                key={player.socket}
+              >
+                {player.name} ({player.socket})
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="button-container">
+          {rooms[roomName].socketId === socketRef.current.id && (
+            <button
+              disabled={rooms[roomName].players.length <= 1}
+              onClick={() => startGame(socketRef.current, roomName)}
+              className="action-button"
             >
-              {player.name} ({player.socket})
-            </li>
-          ))}
-        </ul>
-        <br></br>
-        {rooms[roomName].socketId === socketRef.current.id && (
-          <button
-            disabled={rooms[roomName].players.length <= 1}
-            onClick={() => startGame(socketRef.current, roomName)}
-          >
-            Start Game
-          </button>
-        )}
-        {rooms[roomName].socketId === socketRef.current.id ? (
-          <button onClick={() => deleteRoom(socketRef.current, roomName)}>
-            Delete Room
-          </button>
-        ) : (
-          <button onClick={() => leaveRoom(socketRef.current, roomName)}>
-            Leave Room
-          </button>
-        )}
-      </>
+              Start Game
+            </button>
+          )}
+          {rooms[roomName].socketId === socketRef.current.id ? (
+            <button
+              onClick={() => deleteRoom(socketRef.current, roomName)}
+              className="action-button"
+            >
+              Delete Room
+            </button>
+          ) : (
+            <button
+              onClick={() => leaveRoom(socketRef.current, roomName)}
+              className="action-button"
+            >
+              Leave Room
+            </button>
+          )}
+        </div>
+      </div>
     );
   }
   return (
-    <>
+    <div className="multiplayer-container">
+      <h1>Multiplayer</h1>
       <div id="error" className="error"></div>
       <form
+        className="create-room-form"
         onSubmit={(e) => {
           e.preventDefault();
           createRoom(
@@ -194,12 +207,17 @@ function Multiplayer() {
             document.getElementById("roomName").value,
             user.primaryEmailAddress.emailAddress,
             document.getElementById("roomLevel").value,
-            levels,
+            levels
           );
         }}
       >
-        <input id="roomName" type="text" placeholder="Room Name: "></input>
-        <select id="roomLevel">
+        <input
+          id="roomName"
+          type="text"
+          placeholder="Room Name"
+          className="create-room-input"
+        ></input>
+        <select id="roomLevel" className="create-room-select">
           {levels.map((level) => (
             <option key={level._id} value={level._id}>
               {level.name} by {level.creator.name}
@@ -209,12 +227,12 @@ function Multiplayer() {
         <input
           type="submit"
           value="Create Room"
-          className="home-game-button"
+          className="create-room-button"
         ></input>
       </form>
 
       {Object.keys(rooms).map((room) => (
-        <div key={room}>
+        <div key={room} className="room-info">
           {room}
           <div>{rooms[room].players.length} / 5</div>
           <button
@@ -223,7 +241,7 @@ function Multiplayer() {
               joinRoom(
                 socketRef.current,
                 room,
-                user.primaryEmailAddress.emailAddress,
+                user.primaryEmailAddress.emailAddress
               )
             }
           >
@@ -231,7 +249,7 @@ function Multiplayer() {
           </button>
         </div>
       ))}
-    </>
+    </div>
   );
 }
 

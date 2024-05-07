@@ -62,10 +62,10 @@ function Home() {
       <h2 className="overview-title">Overview</h2>
       <p className="overview-description">
          Our project is a web application-based video game focusing on rhythm and typing. 
-        <br />
+
         Players type pre-mapped keyboard
         keys to the beat of a song, aiming for precision to earn points. 
-        <br />
+        
         The game features singleplayer and multiplayer modes, along with a level
         creator for user-generated content.
       </p>
