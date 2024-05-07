@@ -7,6 +7,9 @@ import path from 'path';
 class songHandler{
     constructor(storePath){
         this.storagePath = path.resolve(storePath) + "/";
+        if(!fs.existsSync(this.storagePath)){
+            fs.mkdirSync(this.storagePath);
+        }
     }
 
     async storeFile(userId, fileObj){

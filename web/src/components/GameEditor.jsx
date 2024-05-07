@@ -11,7 +11,7 @@ function EditorType({onClick, onMoveBlock=(()=>{}), onDeleteBlock=(() => {}), fe
     const [isFeatured, setFeatured] = useState(featured || false);
     const { time, letter, currentTime, up } = props;
     const leftPosition = (time - currentTime) / 10;
-  
+    const deleteRef = useRef(false);
     if (time < currentTime - 1000) return;
   
     //move 100px per second
@@ -27,12 +27,12 @@ function EditorType({onClick, onMoveBlock=(()=>{}), onDeleteBlock=(() => {}), fe
           }}
           onMouseEnter={() => {setFeatured(true)}}
           onMouseLeave={() => setFeatured(false)}
-          onClick={() => featured && onClick()}
+          onClick={() => !deleteRef.current && onClick()}
         >
           <span>{letter}</span>
           <div style={{textAlign: "center"}}>
             <button className="editor-type-button" onClick={() => onMoveBlock(false)}>{"<"}</button>{' '}
-            <button className="editor-type-button" style={{color: "red"}} onClick={onDeleteBlock}>{"x"}</button>{' '}
+            <button className="editor-type-button" style={{color: "red"}} onClick={() => {deleteRef.current = true; onDeleteBlock()}}>{"x"}</button>{' '}
             <button className="editor-type-button" onClick={() => onMoveBlock(true)}>{">"}</button>
           </div>
         </div>
@@ -203,7 +203,6 @@ function GameEditor({playerRef, running, timestamp, levelData, renderFlag, onSav
                                 return {data: [...l.data.slice(0,i), ...l.data.slice(i+1)], maxId: l.maxId};
                             });setFeaturedIndex(-1);}  }
                             onClick={() => {
-                                console.log('click!');
                                 setFeaturedIndex(t[0]);
                             }}
                         />

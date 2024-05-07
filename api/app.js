@@ -266,15 +266,6 @@ app.route("/webhook").post(async (req, res) => {
   res.status(200).send();
 });
 
-app.route("/seed").post(async (req, res) => {
-  try {
-    await createLevel(req.body, "D:/Coding\\cs554-rhythm\\web\\public\\songs\\abc.mp3");
-    res.status(200).send('all good');
-  } catch (error) {
-    console.log(error);
-  }
-});
-
 configRoutes(app);
 
 httpServer.listen(4000, () => {
