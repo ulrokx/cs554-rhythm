@@ -2,9 +2,17 @@ import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { css } from "@emotion/react";
+import { BeatLoader } from "react-spinners";
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useUser();
   const { id } = useParams();
@@ -20,10 +28,15 @@ const ProfilePage = () => {
         `${import.meta.env.VITE_BACKEND_URL}/users/${id}`,
       );
       setProfile(response.data);
+      setLoading(false);
     })();
   }, [user, id]);
   if (!profile) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-spinner">
+        <BeatLoader color={"#ff9933"} loading={loading} css={override} size={15} />
+      </div>
+    );
   }
   return (
     <div className="profile-page">

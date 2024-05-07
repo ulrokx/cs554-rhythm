@@ -4,6 +4,13 @@ import { useUser } from "@clerk/clerk-react";
 import Game from "../components/Game";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { css } from "@emotion/react";
+import { BeatLoader } from "react-spinners";
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
 
 //Calculates the leaderboard of a room
 function getLeaderboard(room) {
@@ -56,6 +63,7 @@ function Multiplayer() {
   const [roomName, setRoomName] = useState("");
   const [inGame, setInGame] = useState(false);
   const [levels, setLevels] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     socketRef.current = io("http://localhost:4000");
@@ -94,9 +102,11 @@ function Multiplayer() {
       navigate("/ranking", { state: finalRanking });
     });
 
+    setLoading(false);
     return () => {
       socketRef.current.disconnect();
-    };
+    }; 
+    
   }, []);
 
   //Used to get the available levels for form population
@@ -109,7 +119,11 @@ function Multiplayer() {
   }, []);
 
   if (!user || !levels) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-spinner">
+        <BeatLoader color={"#ff9933"} loading={loading} css={override} size={15} />
+      </div>
+    );
   } else if (inGame) {
     return (
       <>

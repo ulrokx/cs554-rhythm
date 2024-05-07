@@ -1,6 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { css } from "@emotion/react";
+import { BeatLoader } from "react-spinners";
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
 
 function sortOld(a, b) {
   return a.timestamp - b.timestamp;
@@ -41,6 +48,8 @@ const sortOptions = {
 const LevelsPage = () => {
   const [levels, setLevels] = useState(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     (async () => {
       const levelsData = await axios.get(
@@ -69,6 +78,7 @@ const LevelsPage = () => {
           return level;
         }),
       );
+      setLoading(false);
     })();
   }, []);
   const addFavorite = async (id) => {
@@ -133,7 +143,11 @@ const LevelsPage = () => {
     );
   };
   if (!levels) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-spinner">
+        <BeatLoader color={"#ff9933"} loading={loading} css={override} size={15} />
+      </div>
+    );
   }
   return (
     <div className="levels-page">

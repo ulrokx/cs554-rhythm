@@ -105,7 +105,7 @@ function Home() {
           Computer Science Major
           <br />
           Github:
-          <a href="https://github.com" target="_blank"> Josh's GitHub Link :)</a>
+          <a href="https://github.com/joshbernsteint" target="_blank"> @joshbernsteint</a>
           <br />
           Email:
           <a href="mailto:jbernst1@stevens.edu" target="_blank"> jbernst1@stevens.edu</a>
