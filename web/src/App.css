@@ -356,3 +356,23 @@ p {
 .play-button:hover {
   background-color: #cc4d90;
 }
+
+.leaderboard-link {
+  margin-bottom: 20px;
+}
+
+.leaderboard-container {
+  margin-top: 50px;
+}
+
+.ol {
+  list-style-type: decimal;
+  padding: 0;
+  text-align: center;
+}
+
+.score-item {
+  padding-inline-start: 10px;
+  font-size: larger;
+}
+

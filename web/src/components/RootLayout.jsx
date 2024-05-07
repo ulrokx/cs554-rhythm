@@ -25,14 +25,14 @@ const RootLayout = () => {
           <Link className="home-game-button" to="/levels">
             Levels
           </Link>
+          <Link className="home-game-button" to="/Multiplayer">
+            Multiplayer
+          </Link>
+
         </SignedIn>
         <SignedOut>
           <Link to="/sign-in">Sign In</Link>
         </SignedOut>
-
-        <Link className="home-game-button" to="/Multiplayer">
-            Multiplayer
-        </Link>
 
         <Link className="home-game-button" to="/">
             Home
