@@ -240,7 +240,7 @@ function GameEditor({playerRef, running, timestamp, levelData, renderFlag, onSav
                     ) : (
                         <ul style={{marginTop: "0"}}>
                             <li><span style={{fontStyle: "italic"}}>p: </span> Place Mode</li>
-                            <li><span style={{fontStyle: "italic"}}>x: </span> Delete Block</li>
+                            <li><span style={{fontStyle: "italic"}}>r: </span> Delete Block</li>
                             <li><span style={{fontStyle: "italic"}}>q/e: </span> Select left/right</li>
                             <li><span style={{fontStyle: "italic"}}>a/d: </span> Move left/right</li>
                             <li><span style={{fontStyle: "italic"}}>w/s: </span> Move up/down</li>
