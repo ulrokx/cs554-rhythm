@@ -99,6 +99,7 @@ export const createLevel = async (level) => {
       name: user.name,
     },
     timestamp: new Date().getTime(),
+    highscores: []
   };
   const insertResult = await levelsCollection.insertOne(levelDocument);
   if (!insertResult.insertedId) {

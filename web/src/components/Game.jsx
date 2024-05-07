@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useStopwatch } from "react-use-precision-timer";
 import Type from "./Type";
 import "../App.css";
+import axios from "axios";
 
 //Gets all types needed for a song: returns [[time, letter], ...]
 function getAllTypingNeeded(song, score) {
@@ -35,9 +36,8 @@ function Game(props) {
   const [_, setOurTimer] = useState(0); //Use ourTimer to cause render in a small interval
   const [typeObjects, setTypeObjects] = useState([]);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [gameScores, setGameScores] = useState([]);
 
-  const { multiplayer, updateScore, level, levelName } = props;
+  const { multiplayer, updateScore, level, levelName, levelId } = props;
 
   //Used to start the game immediately if multiplayer
   useEffect(() => {
@@ -56,7 +56,6 @@ function Game(props) {
       audio.play();
       audio.addEventListener("ended", () => {
         stopwatch.stop();
-        setGameScores([{ name: "Player", score }]);
         setIsGameOver(true);
       });
 
@@ -99,7 +98,7 @@ function Game(props) {
         }
       });
     }
-  }, [isPlaying, isGameOver, gameScores]);
+  }, [isPlaying]);
 
   const restartGame = () => {
     window.location.reload();
@@ -111,8 +110,40 @@ function Game(props) {
   };
 
  
-  const endGame = () => {
-    navigate("/leaderboard", { state: gameScores });
+  const endGame = async () => {
+    const userData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/me`, { withCredentials: true },);
+    const highestScores = userData.data.highscores;
+    let found = false;
+    let highestScore = false;
+    for (let i = 0; i < highestScores.length; i++) {
+      if (highestScores[i].levelId === levelId) {
+        found = true;
+        if (score > highestScores[i].score) {
+          highestScore = true;
+          await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/users/highscore/${levelId}`,
+            {newScore: score},
+            { withCredentials: true },
+          );
+        }
+        break;
+      }
+    }
+    if (!found) {
+      highestScore = true;
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/users/highscore/${levelId}`,
+        {newScore: score},
+        { withCredentials: true },
+      );
+    }
+    const levelData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/levels/${levelId}`);
+    const levelLeaderboard = levelData.data.highscores;
+    if (highestScore) {
+      levelLeaderboard.highestScore = true;
+    }
+
+    navigate("/leaderboard", { state: levelLeaderboard });
   };
   
 

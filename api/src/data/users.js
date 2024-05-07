@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { users } from "./config/mongoCollections.js";
+import { users, levels } from "./config/mongoCollections.js";
 import { getLevelById } from "./levels.js";
 
 const usersCollection = await users();
@@ -78,6 +78,26 @@ export const addFavoriteLevel = async (userId, levelId) => {
   const newUser = await getUserByClerkId(userId);
   return newUser;
 };
+
+export const addHighestScore = async (userId, levelId, newScore) => {
+  const user = await getUserByClerkId(userId);
+  const level = await getLevelById(levelId);
+  const updatedUser = await usersCollection.updateOne({_id: user._id}, {$set: user});
+  if (updatedUser.modifiedCount === 0) {
+    const addToUser = await usersCollection.updateOne({_id: user._id}, {$push: {highscores: {levelId, score: newScore}}});
+    if (addToUser.modifiedCount === 0) {
+      throw new Error("Failed to add highest score to user");
+    }
+  }
+
+  const levelCollection = await levels();
+  const addToLevels = await levelCollection.updateOne({_id: level._id}, {$push: {highscores: {name: user.name, score: newScore}}});
+  if (addToLevels.modifiedCount === 0) {
+    throw new Error("Failed to add highest score to level");
+  }
+  const newUser = await getUserByClerkId(userId);
+  return newUser;
+}
 
 export const follow = async (userId, followId) => {
   const user = await getUserByClerkId(userId);
