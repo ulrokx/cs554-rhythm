@@ -16,6 +16,7 @@ export default function Creator({...props}){
     const authData = useAuth();
     const navigatge = useNavigate();
     const [songData, setSongData] = useState(undefined);
+    const [baseData, setBaseData] = useState(undefined);
     const [renderFlag, setFlag] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [editingTitle, setEditingTitle] = useState(false);
@@ -36,12 +37,13 @@ export default function Creator({...props}){
         formData.append('userId',authData.userId);
         formData.append('song',target[1].files[0]);
         const songPost = await axios.post('http://localhost:4000/levels/', formData, {headers: {"Content-Type": 'multipart/form-data'}});
-        // setSongData({id: songPost.data._id, levelData: songPost.data.data, name: songPost.data.name, songPath: songPost.data.songPath});
         navigatge(`/creator/${songPost.data._id}`);
     }
 
     function setSongDataFromInput(data){
-        setSongData({id: data._id, levelData: data.data, name: data.name, songPath: data.songPath, published: data.published});
+        const r = {id: data._id, levelData: data.data, name: data.name, songPath: data.songPath, published: data.published};
+        setBaseData({...r})
+        setSongData({...r});
     }
 
     async function handleSave(data, newPublished){
@@ -63,6 +65,8 @@ export default function Creator({...props}){
         }
         if(params.id) getLevel(params.id);
     }, [params.id]);
+
+
 
 
     if(!songData)

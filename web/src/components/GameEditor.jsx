@@ -27,7 +27,7 @@ function EditorType({onClick, onMoveBlock=(()=>{}), onDeleteBlock=(() => {}), fe
           }}
           onMouseEnter={() => {setFeatured(true)}}
           onMouseLeave={() => setFeatured(false)}
-          onClick={onClick}
+          onClick={() => featured && onClick()}
         >
           <span>{letter}</span>
           <div style={{textAlign: "center"}}>
@@ -126,7 +126,12 @@ function GameEditor({playerRef, running, timestamp, levelData, renderFlag, onSav
                                     setLevel((l) => {
                                         return {...l, data: l.data.filter(e => e[0] !== featuredId)};
                                     });
-                                    setFeaturedIndex(level.data[featuredIndex+1][0]);
+                                    if(featuredIndex >= level.data.length - 1){
+                                        setFeaturedIndex(-1);
+                                    }
+                                    else{
+                                        setFeaturedIndex(level.data[featuredIndex+1][0]);
+                                    }
                                     break;
                                 case 'a':
                                     setLevel((l) => {
@@ -194,10 +199,11 @@ function GameEditor({playerRef, running, timestamp, levelData, renderFlag, onSav
                                     return {...l};
                                 });
                             }}
-                            onDeleteBlock={() => setLevel(l => {
+                            onDeleteBlock={() => {setLevel(l => {
                                 return {data: [...l.data.slice(0,i), ...l.data.slice(i+1)], maxId: l.maxId};
-                            })}
+                            });setFeaturedIndex(-1);}  }
                             onClick={() => {
+                                console.log('click!');
                                 setFeaturedIndex(t[0]);
                             }}
                         />
