@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { createUser } from "./src/data/users.js";
+import { createUser, deleteUser } from "./src/data/users.js";
 import cors from "cors";
 import { createLevel } from "./src/data/levels.js";
 import usersRouter from "./src/routes/users.js";
@@ -236,7 +236,7 @@ io.on("connection", (socket) => {
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
     credentials: true,
   }),
 );
@@ -247,6 +247,10 @@ app.route("/webhook").post(async (req, res) => {
     case "user.created": {
       console.log("new user!");
       await createUser(req.body.data);
+      break;
+    }
+    case "user.deleted": {
+      await deleteUser(req.body.data);
       break;
     }
     default: {

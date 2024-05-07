@@ -47,6 +47,18 @@ export const createUser = async (user) => {
   return newUser;
 };
 
+export const deleteUser = async (user) => {
+  const userDocument = await usersCollection.findOne({ clerkId: user.id });
+  if (!userDocument) {
+    return;
+  }
+  const deleteResult = await usersCollection.deleteOne({ clerkId: user.id });
+  if (deleteResult.deletedCount === 0) {
+    throw new Error("Failed to delete user");
+  }
+  return;
+};
+
 export const addFavoriteLevel = async (userId, levelId) => {
   const user = await getUserByClerkId(userId);
   const level = await getLevelById(levelId);
