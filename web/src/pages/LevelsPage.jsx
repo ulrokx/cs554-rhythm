@@ -21,22 +21,6 @@ function sortFollowing(a, b) {
 function sortFavorited(a, b) {
   return b.favorited - a.favorited;
 }
-async function sortPopular(a, b) {
-  const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users`);
-  let cntA = 0,
-    cntB = 0;
-  for (let i = 0; i < data.length; i++) {
-    for (let j = 0; j < data[i].favoriteLevels.length; j++) {
-      if (data[i].favoriteLevels[j]._id === a._id) {
-        cntA++;
-      }
-      if (data[i].favoriteLevels[j]._id === b._id) {
-        cntB++;
-      }
-    }
-  }
-  return cntB - cntA;
-}
 
 const sortOptions = {
   oldest: sortOld,
@@ -63,6 +47,8 @@ const LevelsPage = () => {
         `${import.meta.env.VITE_BACKEND_URL}/users/following`,
         { withCredentials: true },
       );
+      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users`, { withCredentials: true },);
+      const myData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/me`, { withCredentials: true },);
       setLevels(
         levelsData.data.map((level) => {
           if (favoritedData.data.find(({ _id }) => _id === level._id)) {
@@ -74,6 +60,18 @@ const LevelsPage = () => {
             level.followingCreator = true;
           } else {
             level.followingCreator = false;
+          }
+          let found = false;
+          for (let i = 0; i < data.length; i++) {
+            if (data[i]._id === level.creator._id) {
+              found = true;
+              break;
+            }
+          }
+          if (!found || myData.data._id === level.creator._id) {
+            level.noShowFollow = true;
+          } else {
+            level.noShowFollow = false;
           }
           return level;
         }),
@@ -166,11 +164,11 @@ const LevelsPage = () => {
             <div className="creator-info">
               <p>Created by <span className="creator-name">{level.creator.name}</span></p>
               <div className="button-container">
-                {level.followingCreator ? (
+                {!level.noShowFollow && (level.followingCreator ? (
                   <button className="button unfollow-button" onClick={() => unfollow(level.creator._id)}>Unfollow</button>
                 ) : (
                   <button className="button follow-button" onClick={() => follow(level.creator._id)}>Follow</button>
-                )}
+                ))}
                 {level.favorited ? (
                   <button className="button unfavorite-button" onClick={() => removeFavorite(level._id)}>Unfavorite</button>
                 ) : (

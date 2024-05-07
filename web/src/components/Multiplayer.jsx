@@ -64,6 +64,24 @@ function Multiplayer() {
   const [inGame, setInGame] = useState(false);
   const [levels, setLevels] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [followingCreator, setFollowingCreator] = useState(false);
+  const [showFollow, setShowFollow] = useState(false);
+
+  const follow = async (id) => {
+    await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/users/follow/${id}`,
+      {},
+      { withCredentials: true },
+    );
+    setFollowingCreator(true);
+  };
+  const unfollow = async (id) => {
+    await axios.delete(
+      `${import.meta.env.VITE_BACKEND_URL}/users/follow/${id}`,
+      { withCredentials: true },
+    );
+    setFollowingCreator(false);
+  };
 
   useEffect(() => {
     socketRef.current = io("http://localhost:4000");
@@ -156,12 +174,45 @@ function Multiplayer() {
       </>
     );
   } else if (inRoom) {
+    async function configureFollowing() {
+      const followingData = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/users/following`,
+        { withCredentials: true },
+      );
+      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users`, { withCredentials: true },);
+      const myData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/me`, { withCredentials: true },);
+      if (followingData.data.find(({ _id }) => _id === rooms[roomName].level.creator._id)) {
+        setFollowingCreator(true);
+      } else {
+        setFollowingCreator(false);
+      }
+      let found = false;
+      for (let i = 0; i < data.length; i++) {
+        if (data[i]._id === rooms[roomName].level.creator._id) {
+          found = true;
+          break;
+        }
+      }
+      if (!found || myData.data._id === rooms[roomName].level.creator._id) {
+        setShowFollow(false);
+      } else {
+        setShowFollow(true);
+      }
+    };
+    configureFollowing();
     return (
       <div className="multiplayer-container">
         <h1>Multiplayer Room</h1>
         <div className="room-info">
           <p><strong>Room Name:</strong> {roomName}</p>
-          <p><strong>Level Name:</strong> {rooms[roomName].level.name}</p>
+          <p><strong>Level Name:</strong> {rooms[roomName].level.name} (created by {rooms[roomName].level.creator.name}) 
+          {showFollow && (followingCreator ? (
+                  <button className="button unfollow-button" onClick={() => unfollow(rooms[roomName].level.creator._id)}>Unfollow</button>
+                ) : (
+                  <button className="button follow-button" onClick={() => follow(rooms[roomName].level.creator._id)}>Follow</button>
+                ))
+          }
+          </p>
           <p><strong>Room creator:</strong> {rooms[roomName].creatorName}</p>
           <p><strong>Players:</strong></p>
           <ul>

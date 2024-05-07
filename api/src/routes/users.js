@@ -127,6 +127,18 @@ router.delete("/follow/:userId", ClerkExpressWithAuth(), async (req, res) => {
   }
 });
 
+router.get("/me", ClerkExpressWithAuth(), async (req, res) => {
+  if (!req.auth.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  try {
+    const user = await getUserByClerkId(req.auth.userId);
+    res.json(user);
+  } catch {
+    return res.status(404).json({ error: "User not found" });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   if (!id || typeof id !== "string") {
