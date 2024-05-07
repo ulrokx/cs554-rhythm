@@ -160,4 +160,12 @@ export const updateLevel = async (id, data) => {
 export const getLevels = async () => {
   const levels = await levelsCollection.find().toArray();
   return levels;
-}
+};
+
+export const getLevelById = async (id) => {
+  const level = await levelsCollection.findOne({ _id: new ObjectId(id) });
+  if (!level) {
+    throw new Error("Level not found");
+  }
+  return level;
+};

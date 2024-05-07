@@ -3,6 +3,7 @@ const epsilon = 0.25;
 
 import { useEffect, useState } from "react";
 import { Route, Link, Routes } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useStopwatch } from "react-use-precision-timer";
 import Type from "./Type";
 import "../App.css";
@@ -29,12 +30,15 @@ function getAllTypingNeeded(song, score) {
 function Game(props) {
   //Stopwatch object from https://justinmahar.github.io/react-use-precision-timer/?path=/story/docs-usetimer--docs#timer
   const stopwatch = useStopwatch();
+  const navigate = useNavigate();
   const [score, setScore] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [_, setOurTimer] = useState(0); //Use ourTimer to cause render in a small interval
   const [typeObjects, setTypeObjects] = useState([]);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [gameScores, setGameScores] = useState([]);
 
-  const { multiplayer, updateScore, finishGame, level, levelName } = props;
+  const { multiplayer, updateScore, level, levelName } = props;
 
   //Used to start the game immediately if multiplayer
   useEffect(() => {
@@ -53,7 +57,8 @@ function Game(props) {
       audio.play();
       audio.addEventListener("ended", () => {
         stopwatch.stop();
-        finishGame();
+        setGameScores([{ name: "Player", score }]);
+        setIsGameOver(true);
       });
 
       //Causes render every 10 ms
@@ -95,7 +100,7 @@ function Game(props) {
         }
       });
     }
-  }, [isPlaying]);
+  }, [isPlaying, isGameOver, gameScores]);
 
   const restartGame = () => {
     window.location.reload();
@@ -105,6 +110,12 @@ function Game(props) {
     setScore(0);
     setIsPlaying(true);
   };
+
+ 
+  const endGame = () => {
+    navigate("/leaderboard", { state: gameScores });
+  };
+  
 
   return (
     <>
@@ -144,6 +155,11 @@ function Game(props) {
         </div>
         <div className="game-links">
           {/* <button className="restart-link" onClick={restartGame}>Restart Game</button> */}
+
+          {isGameOver && 
+            <button className= "leaderboard-link" onClick={endGame}>
+              View Leaderboard
+            </button>}
 
           {!multiplayer && isPlaying && (
             <button className="restart-link" onClick={restartGame}>

@@ -19,13 +19,25 @@ const RootLayout = () => {
       <nav>
         <SignedIn>
           <UserButton afterSignOutUrl="/sign-in" />
+          <Link className="home-game-button" to="/profile">
+            Profile
+          </Link>
+          <Link className="home-game-button" to="/levels">
+            Levels
+          </Link>
+          <Link className="home-game-button" to="/Multiplayer">
+            Multiplayer
+          </Link>
+
         </SignedIn>
         <SignedOut>
           <Link to="/sign-in">Sign In</Link>
         </SignedOut>
+
         <Link className="home-game-button" to="/">
-          Home
+            Home
         </Link>
+
       </nav>
       <main>
         <Outlet />

@@ -1,9 +1,10 @@
-import express, { Router } from "express";
+import "dotenv/config";
+import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { createUser } from "./src/data/users.js";
-import cors from 'cors';
-import { createLevel, getLevels } from "./src/data/levels.js";
+import { createUser, deleteUser } from "./src/data/users.js";
+import cors from "cors";
+import { createLevel } from "./src/data/levels.js";
 import configRoutes from "./src/routes/index.js";
 import fileUpload from "express-fileupload";
 import { config } from "dotenv";
@@ -238,7 +239,12 @@ io.on("connection", (socket) => {
 app.use(express.json());
 app.use(fileUpload());
 app.use(express.urlencoded({extended: true}));
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    credentials: true,
+  }),
+);
 config();
 
 app.route("/webhook").post(async (req, res) => {
@@ -247,6 +253,10 @@ app.route("/webhook").post(async (req, res) => {
     case "user.created": {
       console.log("new user!");
       await createUser(req.body.data);
+      break;
+    }
+    case "user.deleted": {
+      await deleteUser(req.body.data);
       break;
     }
     default: {
