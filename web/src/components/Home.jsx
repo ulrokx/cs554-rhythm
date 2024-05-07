@@ -2,41 +2,6 @@ import React from "react";
 import { Route, Link, Routes } from "react-router-dom";
 import axios from "axios";
 
-const alphabetSong = {
-  name: "Alphabet",
-  data: {
-    a: [4.05],
-    b: [4.52],
-    c: [4.97],
-    d: [5.5],
-    e: [6],
-    f: [6.6],
-    g: [7.03],
-    h: [8.07],
-    i: [8.57],
-    j: [9.07],
-    k: [9.45],
-    l: [9.93],
-    m: [10.22],
-    n: [10.45],
-    o: [10.77],
-    p: [10.93],
-    q: [11.98],
-    r: [12.54],
-    s: [13.04],
-    t: [13.95],
-    u: [14.47],
-    v: [14.91],
-    w: [15.83],
-    x: [16.78],
-    y: [17.73],
-    z: [18.73],
-  },
-};
-
-async function seed() {
-  await axios.post("http://localhost:4000/seed", alphabetSong);
-}
 
 function Home() {
   return (
@@ -54,9 +19,6 @@ function Home() {
       </p>
 
       <div className="button-container">
-          <button onClick={seed}>
-            Seed Database (adds alphabet song w/ fake user)
-          </button>
         </div>
 
       <h2 className="overview-title">Overview</h2>
@@ -128,10 +90,6 @@ function Home() {
 
 
       </div>
-
-      
-
-
     </>
   );
 }

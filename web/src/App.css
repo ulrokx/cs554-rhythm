@@ -34,6 +34,25 @@ p {
   color: #666;
 }
 
+.editor-type-button{
+  background: transparent;
+  padding: 0;
+  border: none;
+  color: black;
+  margin: 0;
+}
+
+.editor-type-button:hover, .editor-type-button:focus{
+  padding: 0;
+  color: orange;
+}
+
+
+.full_page{
+  width: 100vw;
+  height: 40vh;
+}
+
 .button {
   display: inline-block;
   padding: 10px 20px;

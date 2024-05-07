@@ -2,7 +2,7 @@ import "../App.css";
 function Type(props) {
   const { time, letter, currentTime, up } = props;
   const screenWidth = window.screen.width;
-  const leftPosition = (time - currentTime) / 10 + screenWidth / 2 - 25;
+  const leftPosition = (time - currentTime) / 10;
 
   if (time < currentTime - 1000) return;
 
@@ -15,6 +15,7 @@ function Type(props) {
         style={{
           left: leftPosition + "px",
           transform: "translateY(" + 51 * up + "px)",
+          textAlign: "center",
         }}
       >
         {letter}
