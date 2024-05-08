@@ -15,6 +15,7 @@ import Creator from "./pages/Creator.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import LevelsPage from "./pages/LevelsPage.jsx";
 import LeaderboardPage from "./pages/LeaderboardPage.jsx";
+import ProtectedPages from "./components/ProtectedPages.jsx";
 
 const router = createBrowserRouter([
   {
@@ -23,17 +24,22 @@ const router = createBrowserRouter([
       { path: "/", element: <HomePage /> },
       { path: "/sign-in/*", element: <SignInPage /> },
       { path: "/sign-up/*", element: <SignUpPage /> },
-      { path: "/game", element: <GamePage /> },
-      { path: "/multiplayer", element: <MultiplayerPage /> },
-      { path: "/ranking", element: <RankingPage /> },
-      { path: "/singleplayer", element: <SingleplayerPage /> },
-      { path: "/creator/", element: <Creator /> },
-      { path: "/creator/:id", element: <Creator /> },
-      { path: "/singleplayer", element: <SingleplayerPage /> },
-      { path: "/leaderboard", element: <LeaderboardPage /> },
-      { path: "/profile", element: <ProfilePage /> },
-      { path: "/profile/:id", element: <ProfilePage /> },
-      { path: "/levels", element: <LevelsPage /> },
+      {
+        element: <ProtectedPages />,
+        children: [
+          { path: "/game", element: <GamePage /> },
+          { path: "/multiplayer", element: <MultiplayerPage /> },
+          { path: "/ranking", element: <RankingPage /> },
+          { path: "/singleplayer", element: <SingleplayerPage /> },
+          { path: "/creator/", element: <Creator /> },
+          { path: "/creator/:id", element: <Creator /> },
+          { path: "/singleplayer", element: <SingleplayerPage /> },
+          { path: "/leaderboard", element: <LeaderboardPage /> },
+          { path: "/profile", element: <ProfilePage /> },
+          { path: "/profile/:id", element: <ProfilePage /> },
+          { path: "/levels", element: <LevelsPage /> },
+        ],
+      },
     ],
   },
 ]);

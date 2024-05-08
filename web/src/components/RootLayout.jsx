@@ -33,7 +33,7 @@ const RootLayout = () => {
           </Link>
         </SignedIn>
         <SignedOut>
-          <Link to="/sign-in">Sign In</Link>
+          <Link className="home-game-button" to="/sign-in">Sign In</Link>
         </SignedOut>
 
         <Link className="home-game-button" to="/">
