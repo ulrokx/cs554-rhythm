@@ -123,8 +123,7 @@ function Multiplayer() {
     setLoading(false);
     return () => {
       socketRef.current.disconnect();
-    }; 
-    
+    };
   }, []);
 
   //Used to get the available levels for form population
@@ -139,7 +138,12 @@ function Multiplayer() {
   if (!user || !levels) {
     return (
       <div className="loading-spinner">
-        <BeatLoader color={"#ff9933"} loading={loading} css={override} size={15} />
+        <BeatLoader
+          color={"#ff9933"}
+          loading={loading}
+          css={override}
+          size={15}
+        />
       </div>
     );
   } else if (inGame) {
@@ -179,9 +183,19 @@ function Multiplayer() {
         `${import.meta.env.VITE_BACKEND_URL}/users/following`,
         { withCredentials: true },
       );
-      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users`, { withCredentials: true },);
-      const myData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/me`, { withCredentials: true },);
-      if (followingData.data.find(({ _id }) => _id === rooms[roomName].level.creator._id)) {
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/users`,
+        { withCredentials: true },
+      );
+      const myData = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/users/me`,
+        { withCredentials: true },
+      );
+      if (
+        followingData.data.find(
+          ({ _id }) => _id === rooms[roomName].level.creator._id,
+        )
+      ) {
         setFollowingCreator(true);
       } else {
         setFollowingCreator(false);
@@ -198,23 +212,41 @@ function Multiplayer() {
       } else {
         setShowFollow(true);
       }
-    };
+    }
     configureFollowing();
     return (
       <div className="multiplayer-container">
         <h1>Multiplayer Room</h1>
         <div className="room-info">
-          <p><strong>Room Name:</strong> {roomName}</p>
-          <p><strong>Level Name:</strong> {rooms[roomName].level.name} (created by {rooms[roomName].level.creator.name}) 
-          {showFollow && (followingCreator ? (
-                  <button className="button unfollow-button" onClick={() => unfollow(rooms[roomName].level.creator._id)}>Unfollow</button>
-                ) : (
-                  <button className="button follow-button" onClick={() => follow(rooms[roomName].level.creator._id)}>Follow</button>
-                ))
-          }
+          <p>
+            <strong>Room Name:</strong> {roomName}
           </p>
-          <p><strong>Room creator:</strong> {rooms[roomName].creatorName}</p>
-          <p><strong>Players:</strong></p>
+          <p>
+            <strong>Level Name:</strong> {rooms[roomName].level.name} (created
+            by {rooms[roomName].level.creator.name})
+            {showFollow &&
+              (followingCreator ? (
+                <button
+                  className="button unfollow-button"
+                  onClick={() => unfollow(rooms[roomName].level.creator._id)}
+                >
+                  Unfollow
+                </button>
+              ) : (
+                <button
+                  className="button follow-button"
+                  onClick={() => follow(rooms[roomName].level.creator._id)}
+                >
+                  Follow
+                </button>
+              ))}
+          </p>
+          <p>
+            <strong>Room creator:</strong> {rooms[roomName].creatorName}
+          </p>
+          <p>
+            <strong>Players:</strong>
+          </p>
           <ul>
             {rooms[roomName].players.map((player) => (
               <li
@@ -272,7 +304,7 @@ function Multiplayer() {
             document.getElementById("roomName").value,
             user.primaryEmailAddress.emailAddress,
             document.getElementById("roomLevel").value,
-            levels
+            levels,
           );
         }}
       >
@@ -306,7 +338,7 @@ function Multiplayer() {
               joinRoom(
                 socketRef.current,
                 room,
-                user.primaryEmailAddress.emailAddress
+                user.primaryEmailAddress.emailAddress,
               )
             }
           >

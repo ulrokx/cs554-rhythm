@@ -34,7 +34,12 @@ const ProfilePage = () => {
   if (!profile) {
     return (
       <div className="loading-spinner">
-        <BeatLoader color={"#ff9933"} loading={loading} css={override} size={15} />
+        <BeatLoader
+          color={"#ff9933"}
+          loading={loading}
+          css={override}
+          size={15}
+        />
       </div>
     );
   }

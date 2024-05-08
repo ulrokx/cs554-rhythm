@@ -13,8 +13,6 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
 const rooms = {}; //key is roomName, value is {creatorName: string, socketId: socketId and playerIds [socketId] and players [{name: str, score: int}] and level: {Level Object} and inGame bool and finished bool}
 
-
-
 io.on("connection", (socket) => {
   console.log("client connected", socket.id);
 
@@ -238,7 +236,7 @@ io.on("connection", (socket) => {
 
 app.use(express.json());
 app.use(fileUpload());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: ["http://localhost:5173", "http://127.0.0.1:5173"],

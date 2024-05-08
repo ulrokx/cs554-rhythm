@@ -48,8 +48,14 @@ const LevelsPage = () => {
         `${import.meta.env.VITE_BACKEND_URL}/users/following`,
         { withCredentials: true },
       );
-      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users`, { withCredentials: true },);
-      const myData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/me`, { withCredentials: true },);
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/users`,
+        { withCredentials: true },
+      );
+      const myData = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/users/me`,
+        { withCredentials: true },
+      );
       setLevels(
         levelsData.data.map((level) => {
           if (favoritedData.data.find(({ _id }) => _id === level._id)) {
@@ -144,7 +150,12 @@ const LevelsPage = () => {
   if (!levels) {
     return (
       <div className="loading-spinner">
-        <BeatLoader color={"#ff9933"} loading={loading} css={override} size={15} />
+        <BeatLoader
+          color={"#ff9933"}
+          loading={loading}
+          css={override}
+          size={15}
+        />
       </div>
     );
   }
@@ -152,7 +163,10 @@ const LevelsPage = () => {
     <div className="levels-page">
       <h1 className="levels-header">Levels</h1>
       <h2>Order Levels By</h2>
-      <select className="sort-dropdown" onChange={(event) => sortLevels(event.target.value)}>
+      <select
+        className="sort-dropdown"
+        onChange={(event) => sortLevels(event.target.value)}
+      >
         <option value="oldest">Oldest</option>
         <option value="newest">Newest</option>
         <option value="following">Following</option>
@@ -163,19 +177,48 @@ const LevelsPage = () => {
           <div key={level._id} className="level-card">
             <h2 className="level-name">{level.name}</h2>
             <div className="creator-info">
-              <p>Created by <span className="creator-name">{level.creator.name}</span></p>
+              <p>
+                Created by{" "}
+                <span className="creator-name">{level.creator.name}</span>
+              </p>
               <div className="button-container">
-                {!level.noShowFollow && (level.followingCreator ? (
-                  <button className="button unfollow-button" onClick={() => unfollow(level.creator._id)}>Unfollow</button>
-                ) : (
-                  <button className="button follow-button" onClick={() => follow(level.creator._id)}>Follow</button>
-                ))}
+                {!level.noShowFollow &&
+                  (level.followingCreator ? (
+                    <button
+                      className="button unfollow-button"
+                      onClick={() => unfollow(level.creator._id)}
+                    >
+                      Unfollow
+                    </button>
+                  ) : (
+                    <button
+                      className="button follow-button"
+                      onClick={() => follow(level.creator._id)}
+                    >
+                      Follow
+                    </button>
+                  ))}
                 {level.favorited ? (
-                  <button className="button unfavorite-button" onClick={() => removeFavorite(level._id)}>Unfavorite</button>
+                  <button
+                    className="button unfavorite-button"
+                    onClick={() => removeFavorite(level._id)}
+                  >
+                    Unfavorite
+                  </button>
                 ) : (
-                  <button className="button favorite-button" onClick={() => addFavorite(level._id)}>Favorite</button>
+                  <button
+                    className="button favorite-button"
+                    onClick={() => addFavorite(level._id)}
+                  >
+                    Favorite
+                  </button>
                 )}
-                <button className="button play-button" onClick={() => navigate("/game", { state: level })}>Play</button>
+                <button
+                  className="button play-button"
+                  onClick={() => navigate("/game", { state: level })}
+                >
+                  Play
+                </button>
               </div>
             </div>
           </div>
