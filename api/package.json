@@ -6,7 +6,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon -L"
+    "dev": "nodemon -L",
+    "seed": "node src/tasks/seed.js"
   },
   "keywords": [],
   "author": "",
