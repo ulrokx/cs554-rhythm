@@ -128,6 +128,7 @@ export const createLevel = async (body, fileObj) => {
       },
       published: false,
       songPath: fileData.fullPath,
+      highscores: []
     };
   }
   const insertResult = await levelsCollection.insertOne(newLevel);

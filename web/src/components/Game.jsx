@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Route, Link, Routes } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useStopwatch } from "react-use-precision-timer";
+import axios from "axios";
 import Type from "./Type";
 import "../App.css";
 
@@ -38,7 +39,7 @@ function Game(props) {
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameScores, setGameScores] = useState([]);
 
-  const { multiplayer, updateScore, level, levelName } = props;
+  const { multiplayer, updateScore, level, levelName, levelId } = props;
   const audioRef = useRef();
   const indexRef = useRef(0);
 
@@ -112,6 +113,7 @@ function Game(props) {
             key === level[i][2]
           ) {
             found = true;
+
             setScore((prevScore) => {
               const newScore = prevScore + 1;
               if (multiplayer) {
@@ -140,8 +142,40 @@ function Game(props) {
     setIsPlaying(true);
   };
 
-  const endGame = () => {
-    navigate("/leaderboard", { state: gameScores });
+  const endGame = async () => {
+    const userData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/me`, { withCredentials: true },);
+    const highestScores = userData.data.highscores;
+    let found = false;
+    let highestScore = false;
+    for (let i = 0; i < highestScores.length; i++) {
+      if (highestScores[i].levelId === levelId) {
+        found = true;
+        if (score > highestScores[i].score) {
+          highestScore = true;
+          await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/users/highscore/${levelId}`,
+            {newScore: score},
+            { withCredentials: true },
+          );
+        }
+        break;
+      }
+    }
+    if (!found) {
+      highestScore = true;
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/users/highscore/${levelId}`,
+        {newScore: score},
+        { withCredentials: true },
+      );
+    }
+    const levelData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/levels/${levelId}`);
+    const levelLeaderboard = levelData.data.highscores;
+    if (highestScore) {
+      levelLeaderboard.highestScore = true;
+    }
+
+    navigate("/leaderboard", { state: levelLeaderboard });
   };
 
   return (
