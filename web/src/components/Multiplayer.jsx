@@ -84,7 +84,7 @@ function Multiplayer() {
   };
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:4000");
+    socketRef.current = io(import.meta.env.VITE_BACKEND_URL);
 
     //Gets updated status on the rooms
     socketRef.current.on("rooms", (rooms) => {
@@ -129,7 +129,7 @@ function Multiplayer() {
   //Used to get the available levels for form population
   useEffect(() => {
     async function getData() {
-      const { data } = await axios.get("http://localhost:4000/levels");
+      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/levels`)
       setLevels(data);
     }
     getData();

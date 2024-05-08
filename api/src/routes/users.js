@@ -7,6 +7,7 @@ import {
   removeFavoriteLevel,
   follow,
   unfollow,
+  addHighestScore
 } from "../data/users.js";
 
 const router = Router();
@@ -42,6 +43,30 @@ router.get(
     }
   },
 );
+
+router.post("/highscore/:levelId", ClerkExpressWithAuth(), async (req, res) => {
+  if (!req.auth.userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const { levelId } = req.params;
+  if (!levelId || typeof levelId !== "string") {
+    return res.status(400).json({ error: "Invalid level ID" });
+  }
+  const {newScore} = req.body;
+  if (isNaN(newScore) || newScore < 0) {
+    return res.status(400).json({ error: "Invalid Score" });
+  }
+  try {
+    await addHighestScore(req.auth.userId, levelId, newScore);
+    res.status(200).json({ success: true });
+  } catch (e) {
+    if (e.message) {
+      return res.status(400).json({ error: e.message });
+    } else {
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
+});
 
 router.post("/favorite/:levelId", ClerkExpressWithAuth(), async (req, res) => {
   if (!req.auth.userId) {
