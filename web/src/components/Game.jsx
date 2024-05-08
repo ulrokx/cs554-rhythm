@@ -27,6 +27,8 @@ function getAllTypingNeeded(song, score) {
   return types;
 }
 
+const EPSILON_TIMEOUT = epsilon*2*1000;
+
 function Game(props) {
   //Stopwatch object from https://justinmahar.github.io/react-use-precision-timer/?path=/story/docs-usetimer--docs#timer
   const stopwatch = useStopwatch();
@@ -40,7 +42,7 @@ function Game(props) {
 
   const { multiplayer, updateScore, level, levelName } = props;
   const audioRef = useRef();
-  const indexRef = useRef(0);
+  const levelRef = useRef({index: 0, data: props.level || [], used: [], timeoutRef: undefined});
 
   //Used to start the game immediately if multiplayer
   useEffect(() => {
@@ -50,18 +52,18 @@ function Game(props) {
   }, []);
 
   useEffect(() => {
+    if(levelRef.current.timeoutRef){
+      clearTimeout(levelRef.current.timeoutRef);
+    }
+    levelRef.current.timeoutRef = setTimeout(() => {
+      levelRef.current.used = [];
+      levelRef.current.timeoutRef = undefined;
+    }, EPSILON_TIMEOUT);
+  },[typeObjects]);
+
+  useEffect(() => {
     if (isPlaying) {
       stopwatch.start();
-
-      // //Manages audio playing and stopping
-      // const audio = new Audio("/songs/abc.mp3");
-      // audio.play();
-      // audio.addEventListener("ended", () => {
-      //   stopwatch.stop();
-      //   setGameScores([{ name: "Player", score }]);
-      //   setIsGameOver(true);
-      // });
-
       //Causes render every 10 ms
       setInterval(() => {
         setOurTimer(stopwatch.getElapsedRunningTime());
@@ -71,47 +73,19 @@ function Game(props) {
       document.addEventListener("keydown", (e) => {
         const currentTime = stopwatch.getElapsedRunningTime() / 1000;
         const key = e.key.toLowerCase();
-
-        //Checks if it is a valid click
-        // if (Object.keys(level).includes(key)) {
-        //   const validPressTimes = level[key];
-        //   for (let i = 0; i < validPressTimes.length; i++) {
-        //     const checkPressTime = validPressTimes[i];
-
-        //     //Click time is close enough to an intended click
-        //     if (
-        //       currentTime >= checkPressTime - epsilon &&
-        //       currentTime <= checkPressTime + epsilon
-        //     ) {
-        //       setScore((prevScore) => {
-        //         const newScore = prevScore + 1;
-        //         level[key].splice(i, 1); //Get rid of used click
-        //         if (multiplayer) {
-        //           updateScore(newScore);
-        //         }
-        //         setTypeObjects(getAllTypingNeeded(level, newScore)); //reupdate the typings
-        //         return newScore;
-        //       });
-        //       break;
-        //     } else if (checkPressTime > currentTime) {
-        //       //Times are sorted so exit if higher
-        //       break;
-        //     }
-        //   }
-        // }
-        let found = false;
+        const {index, data, used} = levelRef.current;
         for (
-          let i = indexRef.current;
-          i < level.length && level[i][1] <= currentTime + epsilon;
+          let i = index;
+          i < data.length && data[i][1] <= currentTime + epsilon;
           i++
         ) {
-          const checkPressTime = level[i][1];
+          const checkPressTime = data[i][1];
           if (
             currentTime >= checkPressTime - epsilon &&
             currentTime <= checkPressTime + epsilon &&
-            key === level[i][2]
+            key === data[i][2] && !used.includes(data[i][0])
           ) {
-            found = true;
+            levelRef.current.used.push(data[i][0]);
             setScore((prevScore) => {
               const newScore = prevScore + 1;
               if (multiplayer) {
@@ -120,10 +94,11 @@ function Game(props) {
               return newScore;
             });
             setTypeObjects((l) => {
-              return l.filter((e) => e[0] !== level[i][0]);
+              return l.filter((e) => e[0] !== data[i][0]);
             });
+            break;
           }
-          indexRef.current = i;
+          levelRef.current.index = i;
         }
       });
     }
