@@ -12,7 +12,6 @@ if (!PUBLISHABLE_KEY) {
   throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 }
 
-
 const RootLayout = () => {
   const navigate = useNavigate();
   return (

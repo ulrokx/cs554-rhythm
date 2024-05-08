@@ -129,7 +129,9 @@ function Multiplayer() {
   //Used to get the available levels for form population
   useEffect(() => {
     async function getData() {
-      const { data } = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/levels`)
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/levels`,
+      );
       setLevels(data);
     }
     getData();

@@ -10,7 +10,6 @@ import axios from "axios";
 import Type from "./Type";
 import "../App.css";
 
-
 //Gets all types needed for a song: returns [[time, letter], ...]
 function getAllTypingNeeded(song, score) {
   const letters = Object.keys(song);
@@ -29,7 +28,7 @@ function getAllTypingNeeded(song, score) {
   return types;
 }
 
-const EPSILON_TIMEOUT = epsilon*2*1000;
+const EPSILON_TIMEOUT = epsilon * 2 * 1000;
 
 function Game(props) {
   //Stopwatch object from https://justinmahar.github.io/react-use-precision-timer/?path=/story/docs-usetimer--docs#timer
@@ -45,13 +44,18 @@ function Game(props) {
 
   const { multiplayer, updateScore, level, levelName, levelId } = props;
   const audioRef = useRef();
-  const levelRef = useRef({index: 0, data: props.level || [], used: [], timeoutRef: undefined});
+  const levelRef = useRef({
+    index: 0,
+    data: props.level || [],
+    used: [],
+    timeoutRef: undefined,
+  });
 
-  const sleep = (ms = 0) => new Promise(resolve => setTimeout(resolve, ms));
+  const sleep = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));
 
   async function animation(factor) {
-    const opts = [-25, ]
-    document.getElementById("effect").style.top = (-25 + factor * 50) + "px";
+    const opts = [-25];
+    document.getElementById("effect").style.top = -25 + factor * 50 + "px";
     setDoAnimation(true);
     await sleep(50);
     setDoAnimation(false);
@@ -65,14 +69,14 @@ function Game(props) {
   }, []);
 
   useEffect(() => {
-    if(levelRef.current.timeoutRef){
+    if (levelRef.current.timeoutRef) {
       clearTimeout(levelRef.current.timeoutRef);
     }
     levelRef.current.timeoutRef = setTimeout(() => {
       levelRef.current.used = [];
       levelRef.current.timeoutRef = undefined;
     }, EPSILON_TIMEOUT);
-  },[typeObjects]);
+  }, [typeObjects]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -86,7 +90,7 @@ function Game(props) {
       document.addEventListener("keydown", (e) => {
         const currentTime = stopwatch.getElapsedRunningTime() / 1000;
         const key = e.key.toLowerCase();
-        const {index, data, used} = levelRef.current;
+        const { index, data, used } = levelRef.current;
         for (
           let i = index;
           i < data.length && data[i][1] <= currentTime + epsilon;
@@ -96,7 +100,8 @@ function Game(props) {
           if (
             currentTime >= checkPressTime - epsilon &&
             currentTime <= checkPressTime + epsilon &&
-            key === data[i][2] && !used.includes(data[i][0])
+            key === data[i][2] &&
+            !used.includes(data[i][0])
           ) {
             animation(data[i][3]);
             levelRef.current.used.push(data[i][0]);
@@ -130,7 +135,10 @@ function Game(props) {
   };
 
   const endGame = async () => {
-    const userData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/me`, { withCredentials: true },);
+    const userData = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/users/me`,
+      { withCredentials: true },
+    );
     const highestScores = userData.data.highscores;
     let found = false;
     let highestScore = false;
@@ -141,7 +149,7 @@ function Game(props) {
           highestScore = true;
           await axios.post(
             `${import.meta.env.VITE_BACKEND_URL}/users/highscore/${levelId}`,
-            {newScore: score},
+            { newScore: score },
             { withCredentials: true },
           );
         }
@@ -152,11 +160,13 @@ function Game(props) {
       highestScore = true;
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/users/highscore/${levelId}`,
-        {newScore: score},
+        { newScore: score },
         { withCredentials: true },
       );
     }
-    const levelData = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/levels/${levelId}`);
+    const levelData = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/levels/${levelId}`,
+    );
     const levelLeaderboard = levelData.data.highscores;
     if (highestScore) {
       levelLeaderboard.highestScore = true;
@@ -191,7 +201,12 @@ function Game(props) {
         <div className="game-content">
           <div className="score">Score: {score}</div>
           <div id="range">
-            <img id="effect" hidden={!doAnimation} className="testImage" src={image}></img>
+            <img
+              id="effect"
+              hidden={!doAnimation}
+              className="testImage"
+              src={image}
+            ></img>
             {typeObjects.map((t, i) => (
               <Type
                 key={i}
@@ -235,4 +250,3 @@ function Game(props) {
 }
 
 export default Game;
-

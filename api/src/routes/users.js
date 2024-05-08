@@ -7,7 +7,7 @@ import {
   removeFavoriteLevel,
   addFriend,
   removeFriend,
-  addHighestScore
+  addHighestScore,
 } from "../data/users.js";
 
 const router = Router();
@@ -52,7 +52,7 @@ router.post("/highscore/:levelId", ClerkExpressWithAuth(), async (req, res) => {
   if (!levelId || typeof levelId !== "string") {
     return res.status(400).json({ error: "Invalid level ID" });
   }
-  const {newScore} = req.body;
+  const { newScore } = req.body;
   if (isNaN(newScore) || newScore < 0) {
     return res.status(400).json({ error: "Invalid Score" });
   }
