@@ -20,7 +20,7 @@ export const getUserById = async (id) => {
 export const getUserByClerkId = async (clerkId) => {
   const user = await usersCollection.findOne({ clerkId });
   if (!user) {
-    throw new Error("User not found");
+    throw { status: 404, error: "User not found" };
   }
   return user;
 };
@@ -95,20 +95,39 @@ export const addFavoriteLevel = async (userId, levelId) => {
   return newUser;
 };
 
-export const follow = async (userId, followId) => {
+export const addFriend = async (userId, friendId) => {
   const user = await getUserByClerkId(userId);
-  const follow = await getUserById(followId);
+  const friend = await getUserById(friendId);
   if (
-    user.friends.find(({ _id }) => _id.toString() === followId) !== undefined
+    user.friends.find(({ _id }) => _id.toString() === friendId) !== undefined
   ) {
     return;
   }
   const updateResult = await usersCollection.updateOne(
     { _id: user._id },
-    { $push: { friends: { _id: follow._id, name: follow.name } } },
+    {
+      $push: {
+        friends: {
+          _id: friend._id,
+          name: friend.name,
+          clerkId: friend.clerkId,
+        },
+      },
+    },
   );
-  if (updateResult.modifiedCount === 0) {
-    throw new Error("Failed to follow user");
+  const friendUpdateResult = await usersCollection.updateOne(
+    { _id: friend._id },
+    {
+      $push: {
+        friends: { _id: user._id, name: user.name, clerkId: user.clerkId },
+      },
+    },
+  );
+  if (
+    updateResult.modifiedCount === 0 ||
+    friendUpdateResult.modifiedCount === 0
+  ) {
+    throw new Error("Failed to friend user");
   }
   const newUser = await getUserByClerkId(userId);
   return newUser;
@@ -134,20 +153,27 @@ export const removeFavoriteLevel = async (userId, levelId) => {
   return newUser;
 };
 
-export const unfollow = async (userId, followId) => {
+export const removeFriend = async (userId, friendId) => {
   const user = await getUserByClerkId(userId);
-  const follow = await getUserById(followId);
+  const friend = await getUserById(friendId);
   if (
-    user.friends.find(({ _id }) => _id.toString() === followId) === undefined
+    user.friends.find(({ _id }) => _id.toString() === friendId) === undefined
   ) {
     return;
   }
   const updateResult = await usersCollection.updateOne(
     { _id: user._id },
-    { $pull: { friends: { _id: follow._id } } },
+    { $pull: { friends: { _id: friend._id } } },
   );
-  if (updateResult.modifiedCount === 0) {
-    throw new Error("Failed to unfollow user");
+  const friendUpdateResult = await usersCollection.updateOne(
+    { _id: friend._id },
+    { $pull: { friends: { _id: user._id } } },
+  );
+  if (
+    updateResult.modifiedCount === 0 ||
+    friendUpdateResult.modifiedCount === 0
+  ) {
+    throw new Error("Failed to friend user");
   }
   const newUser = await getUserByClerkId(userId);
   return newUser;

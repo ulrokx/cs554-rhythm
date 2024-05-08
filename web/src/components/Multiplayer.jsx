@@ -64,23 +64,23 @@ function Multiplayer() {
   const [inGame, setInGame] = useState(false);
   const [levels, setLevels] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [followingCreator, setFollowingCreator] = useState(false);
-  const [showFollow, setShowFollow] = useState(false);
+  const [friendsWithCreator, setFriendsWithCreator] = useState(false);
+  const [showFriend, setShowFriend] = useState(false);
 
-  const follow = async (id) => {
+  const addFriend = async (id) => {
     await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/users/follow/${id}`,
+      `${import.meta.env.VITE_BACKEND_URL}/users/friend/${id}`,
       {},
       { withCredentials: true },
     );
-    setFollowingCreator(true);
+    setFriendsWithCreator(true);
   };
-  const unfollow = async (id) => {
+  const removeFriend = async (id) => {
     await axios.delete(
-      `${import.meta.env.VITE_BACKEND_URL}/users/follow/${id}`,
+      `${import.meta.env.VITE_BACKEND_URL}/users/friend/${id}`,
       { withCredentials: true },
     );
-    setFollowingCreator(false);
+    setFriendsWithCreator(false);
   };
 
   useEffect(() => {
@@ -178,9 +178,9 @@ function Multiplayer() {
       </>
     );
   } else if (inRoom) {
-    async function configureFollowing() {
-      const followingData = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/users/following`,
+    async function configureFriendship() {
+      const friendsData = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/users/friends`,
         { withCredentials: true },
       );
       const { data } = await axios.get(
@@ -192,13 +192,13 @@ function Multiplayer() {
         { withCredentials: true },
       );
       if (
-        followingData.data.find(
+        friendsData.data.find(
           ({ _id }) => _id === rooms[roomName].level.creator._id,
         )
       ) {
-        setFollowingCreator(true);
+        setFriendsWithCreator(true);
       } else {
-        setFollowingCreator(false);
+        setFriendsWithCreator(false);
       }
       let found = false;
       for (let i = 0; i < data.length; i++) {
@@ -208,12 +208,12 @@ function Multiplayer() {
         }
       }
       if (!found || myData.data._id === rooms[roomName].level.creator._id) {
-        setShowFollow(false);
+        setShowFriend(false);
       } else {
-        setShowFollow(true);
+        setShowFriend(true);
       }
     }
-    configureFollowing();
+    configureFriendship();
     return (
       <div className="multiplayer-container">
         <h1>Multiplayer Room</h1>
@@ -224,20 +224,22 @@ function Multiplayer() {
           <p>
             <strong>Level Name:</strong> {rooms[roomName].level.name} (created
             by {rooms[roomName].level.creator.name})
-            {showFollow &&
-              (followingCreator ? (
+            {showFriend &&
+              (friendsWithCreator ? (
                 <button
                   className="button unfollow-button"
-                  onClick={() => unfollow(rooms[roomName].level.creator._id)}
+                  onClick={() =>
+                    removeFriend(rooms[roomName].level.creator._id)
+                  }
                 >
-                  Unfollow
+                  Unfriend
                 </button>
               ) : (
                 <button
                   className="button follow-button"
-                  onClick={() => follow(rooms[roomName].level.creator._id)}
+                  onClick={() => addFriend(rooms[roomName].level.creator._id)}
                 >
-                  Follow
+                  Add Friend
                 </button>
               ))}
           </p>

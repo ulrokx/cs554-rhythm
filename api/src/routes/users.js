@@ -5,8 +5,8 @@ import {
   addFavoriteLevel,
   getUserByClerkId,
   removeFavoriteLevel,
-  follow,
-  unfollow,
+  addFriend,
+  removeFriend,
 } from "../data/users.js";
 
 const router = Router();
@@ -28,7 +28,7 @@ router.get(
 );
 
 router.get(
-  "/following",
+  "/friends",
   ClerkExpressWithAuth({ debug: true }),
   async (req, res) => {
     if (!req.auth.userId) {
@@ -63,7 +63,7 @@ router.post("/favorite/:levelId", ClerkExpressWithAuth(), async (req, res) => {
   }
 });
 
-router.post("/follow/:userId", ClerkExpressWithAuth(), async (req, res) => {
+router.post("/friend/:userId", ClerkExpressWithAuth(), async (req, res) => {
   if (!req.auth.userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -72,7 +72,7 @@ router.post("/follow/:userId", ClerkExpressWithAuth(), async (req, res) => {
     return res.status(400).json({ error: "Invalid User ID" });
   }
   try {
-    await follow(req.auth.userId, userId);
+    await addFriend(req.auth.userId, userId);
     res.status(200).json({ success: true });
   } catch (e) {
     if (e.message) {
@@ -107,7 +107,7 @@ router.delete(
   },
 );
 
-router.delete("/follow/:userId", ClerkExpressWithAuth(), async (req, res) => {
+router.delete("/friend/:userId", ClerkExpressWithAuth(), async (req, res) => {
   if (!req.auth.userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -116,7 +116,7 @@ router.delete("/follow/:userId", ClerkExpressWithAuth(), async (req, res) => {
     return res.status(400).json({ error: "Invalid User ID" });
   }
   try {
-    await unfollow(req.auth.userId, req.params.userId);
+    await removeFriend(req.auth.userId, req.params.userId);
     res.status(200).json({ success: true });
   } catch {
     if (e.message) {
@@ -144,7 +144,15 @@ router.get("/:id", async (req, res) => {
   if (!id || typeof id !== "string") {
     return res.status(400).json({ error: "Invalid ID" });
   }
-  res.json(await getUserByClerkId(req.params.id));
+  try {
+    const user = await getUserByClerkId(req.params.id);
+    res.json(user);
+  } catch (e) {
+    if (e.status) {
+      return res.status(e.status).json({ error: e.message });
+    }
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 router.get("/", async (req, res) => {
