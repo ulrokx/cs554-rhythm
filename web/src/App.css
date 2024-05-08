@@ -260,8 +260,17 @@ p {
   margin-bottom: 10px;
 }
 
-.following-item {
-  margin-bottom: 10px;
+.following {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.following > * {
+  width: 100%;
+  color: #4b77b7;
+  font-size: 1.5rem;
 }
 
 .loading {
