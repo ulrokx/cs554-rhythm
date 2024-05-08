@@ -38,6 +38,7 @@ const LevelsPage = () => {
     (async () => {
       const levelsData = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/levels`,
+        { withCredentials: true },
       );
       const favoritedData = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/users/favorite`,

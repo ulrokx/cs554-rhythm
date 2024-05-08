@@ -8,22 +8,24 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import GameEditor from '../components/GameEditor';
 import { round } from '../services/helpers';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaFileUpload } from "react-icons/fa";
 
 
 export default function Creator({...props}){
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
     const params = useParams();
     const authData = useAuth();
-    const navigatge = useNavigate();
+    const navigate = useNavigate();
+    const [allLevels, setLevels] = useState([]);
+    const [uploadedSong, setUploadedSong] = useState(undefined);
     const [songData, setSongData] = useState(undefined);
-    const [baseData, setBaseData] = useState(undefined);
     const [renderFlag, setFlag] = useState(false);
     const [playing, setPlaying] = useState(false);
     const [editingTitle, setEditingTitle] = useState(false);
     const songTime = useRef(0);
     const playerRef = useRef();
     const songUrl = useMemo(() => {
-        if(songData) return 'http://localhost:4000/levels/' + "song/" + songData.id;
+        if(songData) return BACKEND_URL + '/levels/' + "song/" + songData.id;
         else return undefined;
     },[songData]);
 
@@ -36,52 +38,91 @@ export default function Creator({...props}){
         formData.append('name',target[0].value);
         formData.append('userId',authData.userId);
         formData.append('song',target[1].files[0]);
-        const songPost = await axios.post('http://localhost:4000/levels/', formData, {headers: {"Content-Type": 'multipart/form-data'}});
-        navigatge(`/creator/${songPost.data._id}`);
+        const songPost = await axios.post(BACKEND_URL + '/levels/', formData, {withCredentials: true, headers: {"Content-Type": 'multipart/form-data'}});
+        navigate(`/creator/${songPost.data._id}`);
     }
 
     function setSongDataFromInput(data){
         const r = {id: data._id, levelData: data.data, name: data.name, songPath: data.songPath, published: data.published};
-        setBaseData({...r})
         setSongData({...r});
     }
 
-    async function handleSave(data, newPublished){
+    async function handleSave(id, name, data, newPublished, setState=true){
         //Make sure all data times are rounded
         const roundedTimes = data.map(e => [e[0], round(e[1],2), e[2].toLowerCase(), e[3]]);
-        const res = await axios.put('http://localhost:4000/levels/'+songData.id, {
+        const res = await axios.put(BACKEND_URL + '/levels/'+id, {
             data: roundedTimes,
-            name: songData.name,
+            name: name,
             published: newPublished,
-        });
-        setSongDataFromInput(res.data);
+        }, {withCredentials: true});
+        if(setState) setSongDataFromInput(res.data);
     }
 
     useEffect(() => {
         async function getLevel(id){
-            const {data} = await axios.get('http://localhost:4000/levels/'+id);
+            const {data} = await axios.get(BACKEND_URL+'/levels/'+id, {withCredentials: true});
+            console.log(data);
             // setSongData({id: data._id, levelData: data.data, name: data.name, songPath: data.songPath, published: data.published});
             setSongDataFromInput(data);
         }
+        async function getUserLevels(){
+            if(!params.id){
+                const {data} = await axios.get(BACKEND_URL + '/levels/mylevels', {withCredentials: true});
+                console.log(data);
+                setLevels(data);
+            }
+        }
+
         if(params.id) getLevel(params.id);
+        else{
+            getUserLevels();
+            setSongData(undefined);
+            setUploadedSong(undefined);
+        }
     }, [params.id]);
-
-
-
 
     if(!songData)
         return (
-            // TODO: Make this look nice
-            <div>
-                <form 
-                onSubmit={handleSubmit}
-                method="POST"
-                id='fileUpload'
-                >
-                    <input type='text' name='Level_Name'/><br/>
-                    <input type="file" name='fileUpload' accept='.mp3,.ogg,.wav,.avi,.mp4,.mov,.mkv,.flac,.m4a'/><br/>
-                    <input type="submit" />
-                </form>
+            <div className='creator_menu'>
+                <div>
+                    <h1>Your Levels</h1>
+                    {
+                        allLevels.length === 0 ? <>You have created no levels. Get started below!</> : (
+                            allLevels.map((e,i) => (
+                                <div key={i} className='custom_level'>
+                                    <h3 style={{display: 'inline-block', width: "50%", textAlign: "left", fontSize: "18pt", margin: ".5rem"}}>{e.name}</h3>
+                                    <button className='creator_button' onClick={async () => {
+                                        await handleSave(e._id, e.name,e.data,!e.published, false);
+                                        setLevels((l) => l.map((k,i2) => i === i2 ? ({...k, published: !k.published}) : ({...k})));
+                                    }}>{e.published ? "Unpublish" : "Publish"}</button>
+                                    <button className='creator_button' onClick={() => navigate(`/creator/${e._id}`)}>Open</button>
+                                </div>
+                            ))
+                        )
+                    }
+                </div>
+                <div>
+                    <h2>Create a new Level</h2>
+                    <form 
+                    onSubmit={handleSubmit}
+                    method="POST"
+                    id='fileUploadForm'
+                    >
+                        <label style={{fontSize: "14pt"}}>
+                            Level Name (Can be changed later): {' '}
+                            <input type='text' name='level_name' style={{background: "transparent", color: "black", fontSize: "12pt", borderRadius: "5px"}}/>
+                        </label><br/><br/>
+
+
+                            <label id='fileUploadLabel'>
+                                {uploadedSong ? <>Current Song: {uploadedSong}</> : <><FaFileUpload />{' '}Upload your Song</>}
+                                <input type="file" name='fileUpload' accept='.mp3,.ogg,.wav,.avi,.mp4,.mov,.mkv,.flac,.m4a' id='fileUpload' onChange={(s) => {
+                                    setUploadedSong(s.target.value.split('\\').pop());
+                                }}/>
+                            </label><br/><br/>
+                        <button type='submit'>Create</button>
+                    </form>
+                </div>
             </div>
         );
     else{
@@ -113,8 +154,8 @@ export default function Creator({...props}){
                 levelData={songData.levelData} 
                 timestamp={songTime.current}
                 isPublished={songData.published}
-                onSave={(d) => handleSave(d, songData.published)}
-                onPublish={(d) => handleSave(d, !songData.published)}
+                onSave={(d) => handleSave(songData.id, songData.name, d, songData.published)}
+                onPublish={(d) => handleSave(songData.id,songData.name, d, !songData.published)}
                 playerRef={playerRef}
                 />
                 <br/>

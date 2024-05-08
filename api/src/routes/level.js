@@ -1,11 +1,25 @@
 import { Router } from "express";
-import { createLevel, getLevelById, getLevelSongData, getLevels, updateLevel } from "../data/levels.js";
+import { createLevel, getLevelById, getLevelSongData, getLevels, getLevelsByCreator, updateLevel } from "../data/levels.js";
+import { ClerkExpressWithAuth } from "@clerk/clerk-sdk-node";
 import fs from 'fs';
 const router = Router();
 
 router.get('/', async (req,res) => {
     res.json(await getLevels());
 })
+
+router.get('/mylevels', ClerkExpressWithAuth(), async (req,res) => {
+    try {
+        if (!req.auth.userId) {
+            throw {status: 401, error: "Unauthorized"};
+        }
+        const data = await getLevelsByCreator(req.auth.userId);
+        res.status(200).json(data);
+
+    } catch ({status, error}) {
+        res.status(status).json({error});
+    }
+});
 
 router.get('/:id', async (req,res) => {
     try {
@@ -15,6 +29,8 @@ router.get('/:id', async (req,res) => {
         res.status(status).json({error});
     }
 });
+
+
 
 router.post('/', async (req,res) => {
     try {

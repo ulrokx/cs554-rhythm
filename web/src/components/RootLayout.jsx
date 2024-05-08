@@ -28,6 +28,9 @@ const RootLayout = () => {
           <Link className="home-game-button" to="/Multiplayer">
             Multiplayer
           </Link>
+          <Link className="home-game-button" to="/creator">
+            Creator
+          </Link>
 
         </SignedIn>
         <SignedOut>

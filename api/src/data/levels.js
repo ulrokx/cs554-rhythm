@@ -1,43 +1,15 @@
 import { ObjectId } from "mongodb";
 import { levels, users } from "./config/mongoCollections.js";
 import songHandler from "../../songHandler.js";
-import { getUserByClerkId } from "./users.js";
+import { addUserCreatedSong, getUserByClerkId } from "./users.js";
 import { createClient } from "redis";
 import fs from 'fs';
 
 const usersCollection = await users();
 const levelsCollection = await levels();
+const allLevelsRedis = 'allLevels'
 const fileConverter = new songHandler('./songs/');
 const client = await createClient().connect();
-
-const letters = [
-  "a",
-  "b",
-  "c",
-  "d",
-  "e",
-  "f",
-  "g",
-  "h",
-  "i",
-  "j",
-  "k",
-  "l",
-  "m",
-  "n",
-  "o",
-  "p",
-  "q",
-  "r",
-  "s",
-  "t",
-  "u",
-  "v",
-  "w",
-  "x",
-  "y",
-  "z",
-];
 
 export const getLevelById = async (id) => {
   if(!ObjectId.isValid(id)) throw {status: 400, error: "id must be a valid ObjectId"};
@@ -56,7 +28,7 @@ export const getLevelSongData = async (id) => {
     const {songPath} = await getLevelById(id);
     const songSize = fs.statSync(songPath).size;
     const retVal = {songPath, songSize}
-    await client.set(redisKey, JSON.stringify(retVal));
+    await client.set(redisKey, JSON.stringify(retVal), 500);
     return retVal;
     }
 };
@@ -96,6 +68,17 @@ export const uploadSong = async (userId, fileObj) => {
   return finalName;
 };
 
+export const getLevelsByCreator = async (clerkId) => {
+  let userId;
+  try {
+      userId = (await getUserByClerkId(clerkId))._id.toString();
+    } catch (error) {
+      throw {status: 401, error: error.toString()}
+  }
+  const creatorLevels = (await levelsCollection.find().toArray()).filter(e => e.creator._id === userId);
+  return creatorLevels;
+}
+
 export const createLevel = async (body, fileObj) => {
   let userData;
   try {
@@ -104,6 +87,7 @@ export const createLevel = async (body, fileObj) => {
     throw {status: 401, error: error.toString()}
   }
 
+  const userId = userData._id.toString();
 
   let newLevel;
   if(typeof fileObj === "string"){
@@ -111,7 +95,7 @@ export const createLevel = async (body, fileObj) => {
       name: body.name,
       data: checkLevelData(body.data),
       creator: {
-        _id: userData._id.toString(),
+        _id: userId,
         name: userData.name,
       },
       published: false,
@@ -119,12 +103,12 @@ export const createLevel = async (body, fileObj) => {
     };
   }
   else{
-    const fileData = await uploadSong(userData._id.toString(), fileObj);
+    const fileData = await uploadSong(userId, fileObj);
     newLevel = {
       name: body.name,
       data: [],
       creator: {
-        _id: userData._id.toString(),
+        _id: userId,
         name: userData.name,
       },
       published: false,
@@ -135,9 +119,12 @@ export const createLevel = async (body, fileObj) => {
   if (!insertResult.insertedId) {
     throw {status: 500, error: "Internal Server Error"};
   }
+
+  await addUserCreatedSong(userId, insertResult.insertedId.toString());
   const resultLevel = await levelsCollection.findOne({
     _id: insertResult.insertedId,
   });
+  await client.del(allLevelsRedis);
   return resultLevel;
 };
 
@@ -152,13 +139,19 @@ export const updateLevel = async (id, data) => {
       published: checkBoolean(data.published, "published"),
       data: checkLevelData(data.data)
     };
-
+    await client.del(allLevelsRedis);
     const updateResult = await levelsCollection.findOneAndUpdate({_id: new ObjectId(id)}, {$set: result}, {returnDocument: "after"});
     return updateResult;
 };
 
 export const getLevels = async () => {
-  const levels = await levelsCollection.find().toArray();
-  return levels;
+  if(await client.exists(allLevelsRedis)){
+    return JSON.parse(await client.get(allLevelsRedis));
+  }
+  else{
+    const levels = (await levelsCollection.find().toArray()).filter(e => e.published);
+    await client.set(allLevelsRedis, JSON.stringify(levels));
+    return levels;
+  }
 };
 

@@ -25,6 +25,16 @@ export const getUserByClerkId = async (clerkId) => {
   return user;
 };
 
+export const addUserCreatedSong = async (userId, levelId) => {
+    const updateResult = await usersCollection.findOneAndUpdate({_id: new ObjectId(userId)}, {$push: {
+      levels: levelId
+    }}, {returnDocument: "after"});
+    if(!updateResult){
+      throw {status: 500, error: "Internal Server Error"};
+    }
+    return updateResult;
+}
+
 export const createUser = async (user) => {
   const userDocument = {
     clerkId: user.id,

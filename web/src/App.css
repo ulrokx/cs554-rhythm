@@ -395,3 +395,40 @@ p {
   font-size: larger;
 }
 
+
+.creator_menu{
+  margin: 0 auto;
+  width: 50%;
+  padding: 10px;
+  text-align: center;
+}
+
+.creator_button{
+  padding: .5rem;
+  width: 20%;
+  float: right;
+  font-size: 16pt;
+  margin-top: 2px;
+  margin-right: 2px;
+}
+
+.custom_level{
+  border: 1px solid #ff9933;
+  margin: 0.5rem 0;
+  border-radius: 5px;
+  width: auto;
+  padding: 0;
+}
+
+#fileUpload{
+  display: none;
+}
+
+#fileUploadLabel{
+  border: 2px dashed #f28c8caf;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 16pt;
+  border-radius: 5px;
+  padding: .5rem;
+}
