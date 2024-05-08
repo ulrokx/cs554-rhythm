@@ -11,21 +11,21 @@ class songHandler {
     }
   }
 
-    async storeFile(userId, fileObj){
-        const extension = path.extname(fileObj.name);
-        const fileName = `${userId}-${Date.now().toString(36)}`;
-        const newFilePath = path.join(this.storagePath, fileName + extension);
-        await new Promise(res => fileObj.mv(newFilePath, res));
-        return {fullPath: newFilePath, name: fileName, ext: extension};
-    }
+  async storeFile(userId, fileObj) {
+    const extension = path.extname(fileObj.name);
+    const fileName = `${userId}-${Date.now().toString(36)}`;
+    const newFilePath = path.join(this.storagePath, fileName + extension);
+    await new Promise((res) => fileObj.mv(newFilePath, res));
+    return { fullPath: newFilePath, name: fileName, ext: extension };
+  }
 
-    async storeFilePath(userId, filePath){
-        const extension = path.extname(filePath);
-        const fileName = `${userId}-${Date.now().toString(36)}`;
-        const newFilePath = path.join(this.storagePath, fileName + extension);
-        fs.renameSync(filePath, newFilePath);
-        return {fullPath: newFilePath, name: fileName, ext: extension};
-    }
+  async storeFilePath(userId, filePath) {
+    const extension = path.extname(filePath);
+    const fileName = `${userId}-${Date.now().toString(36)}`;
+    const newFilePath = path.join(this.storagePath, fileName + extension);
+    fs.renameSync(filePath, newFilePath);
+    return { fullPath: newFilePath, name: fileName, ext: extension };
+  }
 
   async convertFile({ fullPath, name, ext }) {
     if (ext === ".mp3") return { newName: name + ext, fullPath };

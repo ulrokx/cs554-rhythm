@@ -71,8 +71,12 @@ function checkLevelData(d) {
 
 //Uploads and converts the song
 export const uploadSong = async (userId, fileObj) => {
-  if(!ObjectId.isValid(userId)) throw {status: 400, error: "id must be a valid ObjectId"};
-  const fileData = typeof fileObj === "string" ? (await fileConverter.storeFilePath(userId, fileObj)) : (await fileConverter.storeFile(userId, fileObj));
+  if (!ObjectId.isValid(userId))
+    throw { status: 400, error: "id must be a valid ObjectId" };
+  const fileData =
+    typeof fileObj === "string"
+      ? await fileConverter.storeFilePath(userId, fileObj)
+      : await fileConverter.storeFile(userId, fileObj);
   const finalName = await fileConverter.convertFile(fileData);
   return finalName;
 };
@@ -101,7 +105,7 @@ export const createLevel = async (body, fileObj) => {
   const userId = userData._id.toString();
 
   let newLevel;
-  if(typeof fileObj === "string"){
+  if (typeof fileObj === "string") {
     const fileData = await uploadSong(userId, fileObj);
     newLevel = {
       name: body.name,
