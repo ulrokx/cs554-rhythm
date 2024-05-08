@@ -2,12 +2,14 @@
 const epsilon = 0.25;
 
 import { useEffect, useRef, useState } from "react";
+import image from "../assets/correct.gif";
 import { Route, Link, Routes } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useStopwatch } from "react-use-precision-timer";
 import axios from "axios";
 import Type from "./Type";
 import "../App.css";
+
 
 //Gets all types needed for a song: returns [[time, letter], ...]
 function getAllTypingNeeded(song, score) {
@@ -24,7 +26,6 @@ function getAllTypingNeeded(song, score) {
   for (let i = 0; i < types.length; i++) {
     types[i].push((i + score) % 3);
   }
-  console.log(types);
   return types;
 }
 
@@ -40,10 +41,21 @@ function Game(props) {
   const [typeObjects, setTypeObjects] = useState(props.level || []);
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameScores, setGameScores] = useState([]);
+  const [doAnimation, setDoAnimation] = useState(false);
 
   const { multiplayer, updateScore, level, levelName, levelId } = props;
   const audioRef = useRef();
   const levelRef = useRef({index: 0, data: props.level || [], used: [], timeoutRef: undefined});
+
+  const sleep = (ms = 0) => new Promise(resolve => setTimeout(resolve, ms));
+
+  async function animation(factor) {
+    const opts = [-25, ]
+    document.getElementById("effect").style.top = (-25 + factor * 50) + "px";
+    setDoAnimation(true);
+    await sleep(50);
+    setDoAnimation(false);
+  }
 
   //Used to start the game immediately if multiplayer
   useEffect(() => {
@@ -86,6 +98,7 @@ function Game(props) {
             currentTime <= checkPressTime + epsilon &&
             key === data[i][2] && !used.includes(data[i][0])
           ) {
+            animation(data[i][3]);
             levelRef.current.used.push(data[i][0]);
             setScore((prevScore) => {
               const newScore = prevScore + 1;
@@ -178,6 +191,7 @@ function Game(props) {
         <div className="game-content">
           <div className="score">Score: {score}</div>
           <div id="range">
+            <img id="effect" hidden={!doAnimation} className="testImage" src={image}></img>
             {typeObjects.map((t, i) => (
               <Type
                 key={i}
@@ -221,3 +235,4 @@ function Game(props) {
 }
 
 export default Game;
+
