@@ -1,7 +1,7 @@
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { css } from "@emotion/react";
 import { BeatLoader } from "react-spinners";
 
@@ -24,8 +24,9 @@ const ProfilePage = () => {
       return navigate(`/profile/${user.id}`);
     }
     (async () => {
-      const response = await axios(
+      const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/users/${id}`,
+        { withCredentials: true },
       );
       setProfile(response.data);
       setLoading(false);
@@ -60,11 +61,11 @@ const ProfilePage = () => {
         ))}
       </div>
       <div className="following">
-        <h2>Following</h2>
+        <h2>Friends</h2>
         {profile.friends.map((friend) => (
-          <div key={friend._id} className="following-item">
-            <h3>{friend.name}</h3>
-          </div>
+          <Link key={friend._id} to={`/profile/${friend.clerkId}`}>
+            {friend.name}
+          </Link>
         ))}
       </div>
     </div>

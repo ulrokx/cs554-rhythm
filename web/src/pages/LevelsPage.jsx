@@ -15,8 +15,8 @@ function sortOld(a, b) {
 function sortNew(a, b) {
   return b.timestamp - a.timestamp;
 }
-function sortFollowing(a, b) {
-  return b.followingCreator - a.followingCreator;
+function sortFriends(a, b) {
+  return b.friendsWithCreator - a.friendsWithCreator;
 }
 function sortFavorited(a, b) {
   return b.favorited - a.favorited;
@@ -25,7 +25,7 @@ function sortFavorited(a, b) {
 const sortOptions = {
   oldest: sortOld,
   newest: sortNew,
-  following: sortFollowing,
+  friends: sortFriends,
   favorited: sortFavorited,
 };
 
@@ -44,8 +44,8 @@ const LevelsPage = () => {
         `${import.meta.env.VITE_BACKEND_URL}/users/favorite`,
         { withCredentials: true },
       );
-      const followingData = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/users/following`,
+      const friendsData = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/users/friends`,
         { withCredentials: true },
       );
       const { data } = await axios.get(
@@ -58,15 +58,16 @@ const LevelsPage = () => {
       );
       setLevels(
         levelsData.data.map((level) => {
+          debugger;
           if (favoritedData.data.find(({ _id }) => _id === level._id)) {
             level.favorited = true;
           } else {
             level.favorited = false;
           }
-          if (followingData.data.find(({ _id }) => _id === level.creator._id)) {
-            level.followingCreator = true;
+          if (friendsData.data.find(({ _id }) => _id === level.creator._id)) {
+            level.friendsWithCreator = true;
           } else {
-            level.followingCreator = false;
+            level.friendsWithCreator = false;
           }
           let found = false;
           for (let i = 0; i < data.length; i++) {
@@ -76,9 +77,9 @@ const LevelsPage = () => {
             }
           }
           if (!found || myData.data._id === level.creator._id) {
-            level.noShowFollow = true;
+            level.noShowFriend = true;
           } else {
-            level.noShowFollow = false;
+            level.noShowFriend = false;
           }
           return level;
         }),
@@ -111,17 +112,17 @@ const LevelsPage = () => {
       })),
     );
   };
-  const follow = async (id) => {
+  const addFriend = async (id) => {
     await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/users/follow/${id}`,
+      `${import.meta.env.VITE_BACKEND_URL}/users/friend/${id}`,
       {},
       { withCredentials: true },
     );
     setLevels((levels) =>
       levels.map((level) => ({
         ...level,
-        followingCreator:
-          level.creator._id === id ? true : level.followingCreator,
+        friendsWithCreator:
+          level.creator._id === id ? true : level.friendsWithCreator,
       })),
     );
   };
@@ -134,16 +135,16 @@ const LevelsPage = () => {
     });
   }
 
-  const unfollow = async (id) => {
+  const removeFriend = async (id) => {
     await axios.delete(
-      `${import.meta.env.VITE_BACKEND_URL}/users/follow/${id}`,
+      `${import.meta.env.VITE_BACKEND_URL}/users/friend/${id}`,
       { withCredentials: true },
     );
     setLevels((levels) =>
       levels.map((level) => ({
         ...level,
-        followingCreator:
-          level.creator._id === id ? false : level.followingCreator,
+        friendsWithCreator:
+          level.creator._id === id ? false : level.friendsWithCreator,
       })),
     );
   };
@@ -169,7 +170,7 @@ const LevelsPage = () => {
       >
         <option value="oldest">Oldest</option>
         <option value="newest">Newest</option>
-        <option value="following">Following</option>
+        <option value="friends">Friends</option>
         <option value="favorited">Favorited</option>
       </select>
       <div className="levels-list">
@@ -182,20 +183,20 @@ const LevelsPage = () => {
                 <span className="creator-name">{level.creator.name}</span>
               </p>
               <div className="button-container">
-                {!level.noShowFollow &&
-                  (level.followingCreator ? (
+                {!level.noShowFriend &&
+                  (level.friendsWithCreator ? (
                     <button
                       className="button unfollow-button"
-                      onClick={() => unfollow(level.creator._id)}
+                      onClick={() => removeFriend(level.creator._id)}
                     >
-                      Unfollow
+                      Unfriend
                     </button>
                   ) : (
                     <button
                       className="button follow-button"
-                      onClick={() => follow(level.creator._id)}
+                      onClick={() => addFriend(level.creator._id)}
                     >
-                      Follow
+                      Add Friend
                     </button>
                   ))}
                 {level.favorited ? (
