@@ -47,7 +47,6 @@ function Game(props) {
     if (multiplayer) {
       startGame();
     }
-
   }, []);
 
   useEffect(() => {
@@ -101,29 +100,32 @@ function Game(props) {
         //   }
         // }
         let found = false;
-        for (let i = indexRef.current; i < level.length && level[i][1] <= currentTime + epsilon; i++) {
+        for (
+          let i = indexRef.current;
+          i < level.length && level[i][1] <= currentTime + epsilon;
+          i++
+        ) {
           const checkPressTime = level[i][1];
           if (
-                  currentTime >= checkPressTime - epsilon &&
-                  currentTime <= checkPressTime + epsilon && key === level[i][2]
-            ){
-              found = true;
-              setScore((prevScore) => {
-                        const newScore = prevScore + 1;
-                        if (multiplayer) {
-                          updateScore(newScore);
-                        }
-                        return newScore;
-                });
-                setTypeObjects((l) => {
-                  return l.filter(e => e[0] !== level[i][0]);
-                });
+            currentTime >= checkPressTime - epsilon &&
+            currentTime <= checkPressTime + epsilon &&
+            key === level[i][2]
+          ) {
+            found = true;
+            setScore((prevScore) => {
+              const newScore = prevScore + 1;
+              if (multiplayer) {
+                updateScore(newScore);
               }
-              indexRef.current = i;
+              return newScore;
+            });
+            setTypeObjects((l) => {
+              return l.filter((e) => e[0] !== level[i][0]);
+            });
+          }
+          indexRef.current = i;
         }
-
       });
-
     }
   }, [isPlaying, isGameOver, gameScores]);
 
@@ -138,11 +140,9 @@ function Game(props) {
     setIsPlaying(true);
   };
 
- 
   const endGame = () => {
     navigate("/leaderboard", { state: gameScores });
   };
-  
 
   return (
     <>
@@ -170,35 +170,36 @@ function Game(props) {
         <div className="game-content">
           <div className="score">Score: {score}</div>
           <div id="range">
-          {typeObjects.map((t,i) => (
-            <Type
-              key={i}
-              time={t[1] * 1000}
-              up={t[3]}
-              letter={t[2]}
-              currentTime={stopwatch.getElapsedRunningTime()}
-            />
-          ))}
+            {typeObjects.map((t, i) => (
+              <Type
+                key={i}
+                time={t[1] * 1000}
+                up={t[3]}
+                letter={t[2]}
+                currentTime={stopwatch.getElapsedRunningTime()}
+              />
+            ))}
           </div>
         </div>
-        <audio 
-        src={`${import.meta.env.VITE_BACKEND_URL}/levels/song/${props.levelId}`} 
-        ref={audioRef} 
-        onEnded={() => {
-          console.log('over!');
+        <audio
+          src={`${import.meta.env.VITE_BACKEND_URL}/levels/song/${props.levelId}`}
+          ref={audioRef}
+          onEnded={() => {
+            console.log("over!");
             stopwatch.stop();
             setGameScores([{ name: "Player", score }]);
             setIsGameOver(true);
             setIsPlaying(false);
-        }}
+          }}
         />
         <div className="game-links">
           {/* <button className="restart-link" onClick={restartGame}>Restart Game</button> */}
 
-          {isGameOver && 
-            <button className= "leaderboard-link" onClick={endGame}>
+          {isGameOver && (
+            <button className="leaderboard-link" onClick={endGame}>
               View Leaderboard
-            </button>}
+            </button>
+          )}
 
           {!multiplayer && isPlaying && (
             <button className="restart-link" onClick={restartGame}>

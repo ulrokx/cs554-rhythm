@@ -27,14 +27,14 @@ h1 {
 }
 
 h2 {
-  color: #f28c8caf
+  color: #f28c8caf;
 }
 
 p {
   color: #666;
 }
 
-.editor-type-button{
+.editor-type-button {
   background: transparent;
   padding: 0;
   border: none;
@@ -42,13 +42,13 @@ p {
   margin: 0;
 }
 
-.editor-type-button:hover, .editor-type-button:focus{
+.editor-type-button:hover,
+.editor-type-button:focus {
   padding: 0;
   color: orange;
 }
 
-
-.full_page{
+.full_page {
   width: 100vw;
   height: 40vh;
 }
@@ -294,7 +294,7 @@ p {
   border-radius: 5px;
   margin: 10px;
   padding: 10px;
-  margin-bottom: 20px
+  margin-bottom: 20px;
 }
 
 .level-name {
@@ -395,16 +395,15 @@ p {
   font-size: larger;
 }
 
-
-.creator_menu{
+.creator_menu {
   margin: 0 auto;
   width: 50%;
   padding: 10px;
   text-align: center;
 }
 
-.creator_button{
-  padding: .5rem;
+.creator_button {
+  padding: 0.5rem;
   width: 20%;
   float: right;
   font-size: 16pt;
@@ -412,7 +411,7 @@ p {
   margin-right: 2px;
 }
 
-.custom_level{
+.custom_level {
   border: 1px solid #ff9933;
   margin: 0.5rem 0;
   border-radius: 5px;
@@ -420,15 +419,15 @@ p {
   padding: 0;
 }
 
-#fileUpload{
+#fileUpload {
   display: none;
 }
 
-#fileUploadLabel{
+#fileUploadLabel {
   border: 2px dashed #f28c8caf;
   display: inline-block;
   cursor: pointer;
   font-size: 16pt;
   border-radius: 5px;
-  padding: .5rem;
+  padding: 0.5rem;
 }
