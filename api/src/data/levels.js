@@ -99,7 +99,7 @@ export const createLevel = async (body, fileObj) => {
   try {
     userData = await getUserByClerkId(body.userId);
   } catch (error) {
-    throw { status: 401, error: error.toString() };
+    throw { status: 401, error: error };
   }
 
   const userId = userData._id.toString();

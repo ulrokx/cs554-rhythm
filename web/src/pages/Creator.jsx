@@ -23,6 +23,7 @@ export default function Creator({ ...props }) {
   const [editingTitle, setEditingTitle] = useState(false);
   const songTime = useRef(0);
   const playerRef = useRef();
+  const [errorState, setError] = useState("");
   const songUrl = useMemo(() => {
     if (songData) return BACKEND_URL + "/levels/" + "song/" + songData.id;
     else return undefined;
@@ -33,13 +34,23 @@ export default function Creator({ ...props }) {
     event.preventDefault();
     //Make formdata
     const formData = new FormData();
-    formData.append("name", target[0].value);
+    const trimmedName = target[0].value.trim();
+    if(trimmedName.length === 0){
+      setError("Name cannot be empty")
+      return;
+    }
+    else if(!target[1].files[0]){
+      setError("You must upload a file");
+      return;
+    }
+    formData.append("name", target[0].value.trim());
     formData.append("userId", authData.userId);
     formData.append("song", target[1].files[0]);
     const songPost = await axios.post(BACKEND_URL + "/levels/", formData, {
       withCredentials: true,
       headers: { "Content-Type": "multipart/form-data" },
     });
+    setError("");
     navigate(`/creator/${songPost.data._id}`);
   }
 
@@ -181,7 +192,7 @@ export default function Creator({ ...props }) {
               <input
                 type="file"
                 name="fileUpload"
-                accept=".mp3,.ogg,.wav,.avi,.mp4,.mov,.mkv,.flac,.m4a"
+                accept=".mp3,.ogg,.wav,.avi,.mp4,.mov,.flac,.m4a"
                 id="fileUpload"
                 onChange={(s) => {
                   setUploadedSong(s.target.value.split("\\").pop());
@@ -191,6 +202,7 @@ export default function Creator({ ...props }) {
             <br />
             <br />
             <button type="submit">Create</button>
+            <p  hidden={errorState.length === 0} style={{color: "red"}}>{errorState}</p>
           </form>
         </div>
       </div>
@@ -252,7 +264,7 @@ export default function Creator({ ...props }) {
         />
         <br />
         <AudioPlayer
-          style={{ width: "100%" }}
+          style={{ width: "75%", bottom: "0", position: "fixed", left: "15%"}}
           src={songUrl}
           showSkipControls={false}
           showJumpControls={false}
