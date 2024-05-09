@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "setup": "npm i && cd web && npm install && cd ../api && npm install",
+    "seed": "cd api && npm run seed",
+    "start": "concurrently \"npm run --prefix api start\" \"npm run --prefix web start\"",
     "dev": "concurrently \"npm run --prefix api dev\" \"npm run --prefix web dev\"",
     "format": "prettier -w ."
   },

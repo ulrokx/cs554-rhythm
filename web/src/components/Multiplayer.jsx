@@ -169,6 +169,7 @@ function Multiplayer() {
           </ul>
         </div>
         <Game
+          levelId={rooms[roomName].level._id}
           level={rooms[roomName].level.data}
           levelName={rooms[roomName].level.name}
           multiplayer={true}
