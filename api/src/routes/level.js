@@ -27,7 +27,7 @@ router.get("/mylevels", ClerkExpressWithAuth(), async (req, res) => {
   }
 });
 
-router.get("/:id",ClerkExpressWithAuth(), async (req, res) => {
+router.get("/:id", ClerkExpressWithAuth(), async (req, res) => {
   try {
     const levelData = await getLevelById(req.params.id);
     res.status(200).json(levelData);
@@ -36,7 +36,7 @@ router.get("/:id",ClerkExpressWithAuth(), async (req, res) => {
   }
 });
 
-router.post("/", ClerkExpressWithAuth(),async (req, res) => {
+router.post("/", ClerkExpressWithAuth(), async (req, res) => {
   try {
     if (!req.files || Object.keys(req.files).length === 0)
       throw { status: 400, error: "No files found" };

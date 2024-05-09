@@ -68,6 +68,22 @@ export const deleteUser = async (user) => {
   if (!userDocument) {
     return;
   }
+  await Promise.all(
+    userDocument.friends.map(async (friend) => {
+      const friendDocument = await usersCollection.findOne({ _id: friend._id });
+      if (!friendDocument) {
+        return;
+      }
+      await usersCollection.updateOne(
+        { _id: friend._id, "friends._id": userDocument._id },
+        {
+          $set: {
+            "friends.$.deleted": true,
+          },
+        },
+      );
+    }),
+  );
   const deleteResult = await usersCollection.deleteOne({ clerkId: user.id });
   if (deleteResult.deletedCount === 0) {
     throw new Error("Failed to delete user");
