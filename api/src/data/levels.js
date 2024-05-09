@@ -108,7 +108,7 @@ export const createLevel = async (body, fileObj) => {
   if (typeof fileObj === "string") {
     const fileData = await uploadSong(userId, fileObj);
     newLevel = {
-      name: checkString(body.name,"name"),
+      name: checkString(body.name, "name"),
       data: checkLevelData(body.data),
       creator: {
         _id: userId,

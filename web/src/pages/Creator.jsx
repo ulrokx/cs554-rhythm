@@ -35,11 +35,10 @@ export default function Creator({ ...props }) {
     //Make formdata
     const formData = new FormData();
     const trimmedName = target[0].value.trim();
-    if(trimmedName.length === 0){
-      setError("Name cannot be empty")
+    if (trimmedName.length === 0) {
+      setError("Name cannot be empty");
       return;
-    }
-    else if(!target[1].files[0]){
+    } else if (!target[1].files[0]) {
       setError("You must upload a file");
       return;
     }
@@ -202,7 +201,9 @@ export default function Creator({ ...props }) {
             <br />
             <br />
             <button type="submit">Create</button>
-            <p  hidden={errorState.length === 0} style={{color: "red"}}>{errorState}</p>
+            <p hidden={errorState.length === 0} style={{ color: "red" }}>
+              {errorState}
+            </p>
           </form>
         </div>
       </div>
@@ -264,7 +265,7 @@ export default function Creator({ ...props }) {
         />
         <br />
         <AudioPlayer
-          style={{ width: "75%", bottom: "0", position: "fixed", left: "15%"}}
+          style={{ width: "75%", bottom: "0", position: "fixed", left: "15%" }}
           src={songUrl}
           showSkipControls={false}
           showJumpControls={false}

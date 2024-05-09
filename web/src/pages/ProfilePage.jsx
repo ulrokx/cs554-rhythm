@@ -62,11 +62,15 @@ const ProfilePage = () => {
       </div>
       <div className="following">
         <h2>Friends</h2>
-        {profile.friends.map((friend) => (
-          <Link key={friend._id} to={`/profile/${friend.clerkId}`}>
-            {friend.name}
-          </Link>
-        ))}
+        {profile.friends.map((friend) =>
+          friend.deleted || !friend.clerkId ? (
+            <p key={friend._id}>{friend.name}</p>
+          ) : (
+            <Link key={friend._id} to={`/profile/${friend.clerkId}`}>
+              {friend.name}
+            </Link>
+          ),
+        )}
       </div>
     </div>
   );
