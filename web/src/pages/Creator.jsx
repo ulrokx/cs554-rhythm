@@ -43,7 +43,7 @@ export default function Creator({ ...props }) {
       setError("You must upload a file");
       return;
     }
-    formData.append("name", target[0].value.trim());
+    formData.append("name", trimmedName);
     formData.append("userId", authData.userId);
     formData.append("song", target[1].files[0]);
     const songPost = await axios.post(BACKEND_URL + "/levels/", formData, {

@@ -44,7 +44,6 @@ router.post("/", ClerkExpressWithAuth(),async (req, res) => {
     const newLevel = await createLevel(req.body, req.files.song);
     res.status(200).json(newLevel);
   } catch (error) {
-    console.log(error);
     res.status(400).json({ error });
   }
 });
@@ -74,7 +73,7 @@ router.get("/song/:id", async (req, res) => {
     const audioStream = fs.createReadStream(songPath, { start, end });
     audioStream.pipe(res); //Pipe stream to result
   } catch (error) {
-    console.log("failed!", error.toString());
+    console.log("failed!", error);
   }
 });
 
